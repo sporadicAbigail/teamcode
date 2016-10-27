@@ -1,16 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import org.firstinspires.ftc.teamcode.util.*;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import java.util.ArrayList;
 
-/*
-TODO:
-  * Clean up this mess.
-  * Move to a proportional or PID controller for movement, and make driving and heading adjustments one in the same.
-  * Split Coordinate and Vector functionality into separate classes.
-*/
 @Autonomous(name = "NavCode V1.2.0", group = "Autonomous")
 /**
  * Does stuff!
@@ -135,7 +130,7 @@ public class GTGoal extends OpMode {
 
         //Calculate dirty (non-normalized) heading based on difference in wheel positions
         Vector wheelDiff = new Vector(lPos.difference(rPos));
-        double dirtyHeading = Math.atan2(wheelDiff.Y,wheelDiff.getX()) - (Math.PI / 2.0);
+        double dirtyHeading = Math.atan2(wheelDiff.getY(),wheelDiff.getX()) - (Math.PI / 2.0);
         //Normalize robot heading between [0,2PI)
         heading = (dirtyHeading > 0 ? dirtyHeading : dirtyHeading + 2 * Math.PI) % (2 * Math.PI);
     }
