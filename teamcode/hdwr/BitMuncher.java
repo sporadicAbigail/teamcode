@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class BitMuncher {
     private final double WHEEL_DIAMETER = 9.15;
-    private final double DIFF_DRIVE_RADIUS = 20;
+    private final double DIFF_DRIVE_RADIUS = 20.25;
     private final double TICKS_PER_ROTATION = 1680.0;
 
     private DcMotor leftMotor;
@@ -26,10 +26,7 @@ public class BitMuncher {
     private ArrayList<Coord> path; //Stores the robot's desired route.
     private double drivingSpeed = 0.25;
 
-    private HardwareMap hdwrMap;
-
     public BitMuncher(HardwareMap hdwrMap) {
-        this.hdwrMap = hdwrMap;  //Save reference to the hardware map
         path = new ArrayList<>(); //Creates a new empty ArrayList object
         leftMotor = hdwrMap.dcMotor.get("L"); //Set 'leftMotor' to the motor 'L' from the HardwareMap
         rightMotor = hdwrMap.dcMotor.get("R"); //Set 'rightMotor' to the motor 'R' from the HardwareMap
