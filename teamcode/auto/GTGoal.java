@@ -20,6 +20,6 @@ public class GTGoal extends OpMode {
 
     @Override
     public void loop() {
-        bm.interateGTG();
+        bm.iterateGTG();
     }
 }

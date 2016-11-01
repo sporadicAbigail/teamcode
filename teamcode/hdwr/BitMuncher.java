@@ -45,7 +45,7 @@ public class BitMuncher {
         path.add(new Coord(xCoord,yCoord));
     }
 
-    public void interateGTG() {
+    public void iterateGTG() {
         if (!path.isEmpty()) {
             if (moveTo(path.get(0))) {
                 path.remove(0);
