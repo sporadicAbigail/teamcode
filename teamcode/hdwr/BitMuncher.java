@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.hdwr;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.LightSensor;
 
 import org.firstinspires.ftc.teamcode.util.Coord;
 import org.firstinspires.ftc.teamcode.util.Vector;
@@ -12,6 +13,9 @@ public class BitMuncher {
     private final double WHEEL_DIAMETER = 9.15;
     private final double DIFF_DRIVE_RADIUS = 20.25;
     private final double TICKS_PER_ROTATION = 1680.0;
+
+    private LightSensor leftLS;
+    private LightSensor rightLS;
 
     private DcMotor leftMotor;
     private DcMotor rightMotor;
@@ -28,6 +32,10 @@ public class BitMuncher {
 
     public BitMuncher(HardwareMap hdwrMap) {
         path = new ArrayList<>(); //Creates a new empty ArrayList object
+        leftLS = hdwrMap.lightSensor.get("LS0"); //Set 'leftLS' to the sensor 'LS0' from the HardwareMap
+        rightLS = hdwrMap.lightSensor.get("LS1"); //Set 'rightLS' to the sensor 'LS1' from the HardwareMap
+        leftLS.enableLed(false); //Turn off LED
+        rightLS.enableLed(false); //Turn off LED
         leftMotor = hdwrMap.dcMotor.get("L"); //Set 'leftMotor' to the motor 'L' from the HardwareMap
         rightMotor = hdwrMap.dcMotor.get("R"); //Set 'rightMotor' to the motor 'R' from the HardwareMap
         leftMotor.setDirection(DcMotor.Direction.REVERSE); //Reverses the right motor so both motors drive forward
@@ -43,6 +51,23 @@ public class BitMuncher {
 
     public void pushCoord(double xCoord, double yCoord) {
         path.add(new Coord(xCoord,yCoord));
+    }
+
+    public void iterateLine() {
+        final double TOLERANCE = 0.05;
+        double sensorDiff = leftLS.getLightDetected() - rightLS.getLightDetected();
+        if(sensorDiff > TOLERANCE) {
+            leftMotor.setPower(drivingSpeed);
+            rightMotor.setPower(-drivingSpeed);
+        }
+        else if(sensorDiff < -TOLERANCE) {
+            leftMotor.setPower(-drivingSpeed);
+            rightMotor.setPower(drivingSpeed);
+        }
+        else {
+            leftMotor.setPower(drivingSpeed);
+            rightMotor.setPower(drivingSpeed);
+        }
     }
 
     public void iterateGTG() {
