@@ -8,13 +8,26 @@ import org.firstinspires.ftc.teamcode.hdwr.BitMuncher;
 @Autonomous(name = "Line Follower", group = "Autonomous")
 public class LineFollower extends OpMode {
     private BitMuncher bm;
+    private int state;
 
     @Override
     public void init() {
         this.bm = new BitMuncher(hardwareMap);
+        state = 0;
     }
     @Override
     public void loop() {
-        bm.iterateLine();
+        telemetry.addData("State:",state);
+        switch (state) {
+            case 0:
+                if (bm.iterateLineSeek())
+                    state = 1;
+                break;
+            case 1:
+                bm.iterateLineFollow();
+                if (bm.iterateWallSeek())
+                    state = 2;
+                break;
+        }
     }
 }

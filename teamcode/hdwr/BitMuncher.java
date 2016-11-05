@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.hdwr;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.util.Coord;
 import org.firstinspires.ftc.teamcode.util.Vector;
@@ -13,6 +14,8 @@ public class BitMuncher {
     private final double WHEEL_DIAMETER = 9.15;
     private final double DIFF_DRIVE_RADIUS = 20.25;
     private final double TICKS_PER_ROTATION = 1680.0;
+
+    private TouchSensor frontTS;
 
     private LightSensor leftLS;
     private LightSensor rightLS;
@@ -28,14 +31,16 @@ public class BitMuncher {
 
     //Declare autonomous parameters:
     private ArrayList<Coord> path; //Stores the robot's desired route.
-    private double drivingSpeed = 0.25;
+    private double drivingSpeed;
+    private boolean seekerBit;
+
 
     public BitMuncher(HardwareMap hdwrMap) {
-        path = new ArrayList<>(); //Creates a new empty ArrayList object
         leftLS = hdwrMap.lightSensor.get("LS0"); //Set 'leftLS' to the sensor 'LS0' from the HardwareMap
         rightLS = hdwrMap.lightSensor.get("LS1"); //Set 'rightLS' to the sensor 'LS1' from the HardwareMap
         leftLS.enableLed(false); //Turn off LED
         rightLS.enableLed(false); //Turn off LED
+        frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
         leftMotor = hdwrMap.dcMotor.get("L"); //Set 'leftMotor' to the motor 'L' from the HardwareMap
         rightMotor = hdwrMap.dcMotor.get("R"); //Set 'rightMotor' to the motor 'R' from the HardwareMap
         leftMotor.setDirection(DcMotor.Direction.REVERSE); //Reverses the right motor so both motors drive forward
@@ -45,15 +50,42 @@ public class BitMuncher {
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //Put motor back into driving mode
         lastEncL = leftMotor.getCurrentPosition(); //Sets original encoder value to current
         lastEncR = rightMotor.getCurrentPosition(); //Sets original encoder value to current
+        path = new ArrayList<>(); //Creates a new empty ArrayList object
         position = new Coord(0,0); //Sets starting position to (0,0)
         heading = 0; //Set starting heading to 0 radians
+        drivingSpeed = 0.25; //Set driving speed to 1/4
+        seekerBit = false; //Robot is NOT starting on a line
     }
 
     public void pushCoord(double xCoord, double yCoord) {
         path.add(new Coord(xCoord,yCoord));
     }
 
-    public void iterateLine() {
+    public boolean iterateWallSeek() {
+        if (frontTS.isPressed()) {
+            leftMotor.setPower(0);
+            rightMotor.setPower(0);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean iterateLineSeek() {
+        final double TOLERANCE = 0.05;
+        double sensorDiff = leftLS.getLightDetected() - rightLS.getLightDetected();
+        if(!seekerBit && Math.abs(sensorDiff) > TOLERANCE) {
+            seekerBit = true;
+        }
+        if(seekerBit && !(Math.abs(sensorDiff) > TOLERANCE)) {
+            seekerBit = false;
+            return true;
+        }
+        leftMotor.setPower(drivingSpeed);
+        rightMotor.setPower(drivingSpeed);
+        return false;
+    }
+
+    public void iterateLineFollow() {
         final double TOLERANCE = 0.05;
         double sensorDiff = leftLS.getLightDetected() - rightLS.getLightDetected();
         if(sensorDiff > TOLERANCE) {
