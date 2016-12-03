@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.hdwr;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.util.Coord;
@@ -10,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.Vector;
 
 import java.util.ArrayList;
 
-public class BitMuncher {
+public class QWERTY {
     private final double WHEEL_DIAMETER = 9.15;
     private final double DIFF_DRIVE_RADIUS = 20.25;
     private final double TICKS_PER_ROTATION = 1680.0;
@@ -20,8 +22,13 @@ public class BitMuncher {
     private LightSensor leftLS;
     private LightSensor rightLS;
 
+    private ColorSensor leftCS;
+    private ColorSensor rightCS;
+
     private DcMotor leftMotor;
     private DcMotor rightMotor;
+
+    private Servo buttonServo;
 
     private int lastEncL;
     private int lastEncR;
@@ -35,14 +42,19 @@ public class BitMuncher {
     private boolean seekerBit;
 
 
-    public BitMuncher(HardwareMap hdwrMap) {
+    public QWERTY(HardwareMap hdwrMap) {
+        frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
         leftLS = hdwrMap.lightSensor.get("LS0"); //Set 'leftLS' to the sensor 'LS0' from the HardwareMap
         rightLS = hdwrMap.lightSensor.get("LS1"); //Set 'rightLS' to the sensor 'LS1' from the HardwareMap
         leftLS.enableLed(false); //Turn off LED
         rightLS.enableLed(false); //Turn off LED
-        frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
+        leftCS = hdwrMap.colorSensor.get("CS0"); //Set 'rightCS' to the sensor 'CS0' from the HardwareMap
+        rightCS = hdwrMap.colorSensor.get("CS1"); //Set 'rightCS' to the sensor 'CS0' from the HardwareMap
+        leftCS.enableLed(false); //Turn off LED
+        rightCS.enableLed(false); //Turn off LED
         leftMotor = hdwrMap.dcMotor.get("L"); //Set 'leftMotor' to the motor 'L' from the HardwareMap
         rightMotor = hdwrMap.dcMotor.get("R"); //Set 'rightMotor' to the motor 'R' from the HardwareMap
+        buttonServo = hdwrMap.servo.get("BS"); //Set 'buttonServo' to the sensor 'BS' from the HardwareMap
         leftMotor.setDirection(DcMotor.Direction.REVERSE); //Reverses the right motor so both motors drive forward
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); //Stops robot and resets encoder
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); //Stops robot and resets encoder
