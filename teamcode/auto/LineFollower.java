@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.hdwr.QWERTY;
+import org.firstinspires.ftc.teamcode.util.Color;
 
 @Autonomous(name = "Line Follower", group = "Autonomous")
 public class LineFollower extends OpMode {
@@ -28,6 +29,11 @@ public class LineFollower extends OpMode {
                 if (bm.iterateWallSeek())
                     state = 2;
                 break;
+            case 2:
+                if(bm.iteratePushButton(Color.BLUE))
+                    state = 3;
+                break;
+
         }
     }
 }

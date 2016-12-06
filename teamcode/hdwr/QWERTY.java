@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import org.firstinspires.ftc.teamcode.util.Color;
 import org.firstinspires.ftc.teamcode.util.Coord;
 import org.firstinspires.ftc.teamcode.util.Vector;
 
@@ -71,6 +72,25 @@ public class QWERTY {
 
     public void pushCoord(double xCoord, double yCoord) {
         path.add(new Coord(xCoord,yCoord));
+    }
+
+    public boolean iteratePushButton(Color goal) {
+        Color leftColor = (leftCS.red() > leftCS.blue()) ? Color.RED : Color.BLUE;
+        Color rightColor = (rightCS.red() > rightCS.blue()) ? Color.RED : Color.BLUE;
+        if(leftColor == rightColor && leftColor == goal) {
+            buttonServo.setPosition(125);
+            return true;
+        }
+        else if(leftColor == rightColor) {
+            buttonServo.setPosition(160);
+        }
+        else if(leftColor == goal) {
+            buttonServo.setPosition(160);
+        }
+        else {
+            buttonServo.setPosition(90);
+        }
+        return false;
     }
 
     public boolean iterateWallSeek() {
