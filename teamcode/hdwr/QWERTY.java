@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.util.Vector;
 import java.util.ArrayList;
 
 public class QWERTY {
-    private final double WHEEL_DIAMETER = 9.15;
-    private final double DIFF_DRIVE_RADIUS = 20.25;
+    private final double WHEEL_DIAMETER = 8.5;
+    private final double DIFF_DRIVE_RADIUS = 16.5;
     private final double TICKS_PER_ROTATION = 1680.0;
 
     private TouchSensor frontTS;
@@ -51,12 +51,10 @@ public class QWERTY {
         rightLS.enableLed(false); //Turn off LED
         leftCS = hdwrMap.colorSensor.get("CS0"); //Set 'rightCS' to the sensor 'CS0' from the HardwareMap
         rightCS = hdwrMap.colorSensor.get("CS1"); //Set 'rightCS' to the sensor 'CS0' from the HardwareMap
-        leftCS.enableLed(false); //Turn off LED
-        rightCS.enableLed(false); //Turn off LED
         leftMotor = hdwrMap.dcMotor.get("L"); //Set 'leftMotor' to the motor 'L' from the HardwareMap
         rightMotor = hdwrMap.dcMotor.get("R"); //Set 'rightMotor' to the motor 'R' from the HardwareMap
         buttonServo = hdwrMap.servo.get("BS"); //Set 'buttonServo' to the sensor 'BS' from the HardwareMap
-        leftMotor.setDirection(DcMotor.Direction.REVERSE); //Reverses the right motor so both motors drive forward
+        rightMotor.setDirection(DcMotor.Direction.REVERSE); //Reverses the right motor so both motors drive forward
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); //Stops robot and resets encoder
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); //Stops robot and resets encoder
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //Put motor back into driving mode
@@ -75,6 +73,8 @@ public class QWERTY {
     }
 
     public boolean iteratePushButton(Color goal) {
+        //Rid this trash of magic numbers! Use an instance variable to stone the center value of the
+        //servo and the distance of the press.
         Color leftColor = (leftCS.red() > leftCS.blue()) ? Color.RED : Color.BLUE;
         Color rightColor = (rightCS.red() > rightCS.blue()) ? Color.RED : Color.BLUE;
         if(leftColor == rightColor && leftColor == goal) {
@@ -82,13 +82,13 @@ public class QWERTY {
             return true;
         }
         else if(leftColor == rightColor) {
-            buttonServo.setPosition(160);
+            buttonServo.setPosition(90);
         }
         else if(leftColor == goal) {
-            buttonServo.setPosition(160);
+            buttonServo.setPosition(90);
         }
         else {
-            buttonServo.setPosition(90);
+            buttonServo.setPosition(160);
         }
         return false;
     }
@@ -140,6 +140,14 @@ public class QWERTY {
                 path.remove(0);
             }
         }
+    }
+
+    public String debugStrPos() {
+        return "(" + position.getX() + "," + position.getY() + ")";
+    }
+
+    public String debugStrHead() {
+        return "" + Math.toDegrees(heading);
     }
 
     private void updateState(int deltaEncL, int deltaEncR) {
