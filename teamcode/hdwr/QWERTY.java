@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.util.Color;
 import org.firstinspires.ftc.teamcode.util.Coord;
+import org.firstinspires.ftc.teamcode.util.Direction;
+import org.firstinspires.ftc.teamcode.util.Stop;
 import org.firstinspires.ftc.teamcode.util.Vector;
 
 import java.util.ArrayList;
@@ -17,6 +19,9 @@ public class QWERTY {
     private final double WHEEL_DIAMETER = 8.5;
     private final double DIFF_DRIVE_RADIUS = 16.5;
     private final double TICKS_PER_ROTATION = 1680.0;
+    private final double SERVO_CENTER = 120;
+    private final double SERVO_LEFT = 80;
+    private final double SERVO_RIGHT = 160;
 
     private TouchSensor frontTS;
 
@@ -54,18 +59,9 @@ public class QWERTY {
         leftMotor = hdwrMap.dcMotor.get("L"); //Set 'leftMotor' to the motor 'L' from the HardwareMap
         rightMotor = hdwrMap.dcMotor.get("R"); //Set 'rightMotor' to the motor 'R' from the HardwareMap
         buttonServo = hdwrMap.servo.get("BS"); //Set 'buttonServo' to the sensor 'BS' from the HardwareMap
-        rightMotor.setDirection(DcMotor.Direction.REVERSE); //Reverses the right motor so both motors drive forward
-        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); //Stops robot and resets encoder
-        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); //Stops robot and resets encoder
-        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //Put motor back into driving mode
-        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //Put motor back into driving mode
-        lastEncL = leftMotor.getCurrentPosition(); //Sets original encoder value to current
-        lastEncR = rightMotor.getCurrentPosition(); //Sets original encoder value to current
-        path = new ArrayList<>(); //Creates a new empty ArrayList object
-        position = new Coord(0,0); //Sets starting position to (0,0)
-        heading = 0; //Set starting heading to 0 radians
-        drivingSpeed = 0.25; //Set driving speed to 1/4
-        seekerBit = false; //Robot is NOT starting on a line
+        setDirection(Direction.FORWARD);
+        resetState();
+        setSpeed(0.5);
     }
 
     public void pushCoord(double xCoord, double yCoord) {
@@ -73,22 +69,20 @@ public class QWERTY {
     }
 
     public boolean iteratePushButton(Color goal) {
-        //Rid this trash of magic numbers! Use an instance variable to stone the center value of the
-        //servo and the distance of the press.
         Color leftColor = (leftCS.red() > leftCS.blue()) ? Color.RED : Color.BLUE;
         Color rightColor = (rightCS.red() > rightCS.blue()) ? Color.RED : Color.BLUE;
         if(leftColor == rightColor && leftColor == goal) {
-            buttonServo.setPosition(125);
+            buttonServo.setPosition(SERVO_CENTER);
             return true;
         }
         else if(leftColor == rightColor) {
-            buttonServo.setPosition(90);
+            buttonServo.setPosition(SERVO_LEFT);
         }
         else if(leftColor == goal) {
-            buttonServo.setPosition(90);
+            buttonServo.setPosition(SERVO_LEFT);
         }
         else {
-            buttonServo.setPosition(160);
+            buttonServo.setPosition(SERVO_RIGHT);
         }
         return false;
     }
@@ -134,20 +128,81 @@ public class QWERTY {
         }
     }
 
-    public void iterateGTG() {
+    public boolean iterateGTG() {
         if (!path.isEmpty()) {
             if (moveTo(path.get(0))) {
                 path.remove(0);
             }
+            return false;
+        }
+        else {
+            return true;
         }
     }
 
-    public String debugStrPos() {
-        return "(" + position.getX() + "," + position.getY() + ")";
+    public String debug(String str) {
+        switch(str) {
+            case "Position":
+                return "(" + position.getX() + "," + position.getY() + ")";
+            case "Heading":
+                return "" + Math.toDegrees(heading);
+            default:
+                return "That is not a valid debug parameter.";
+        }
     }
 
-    public String debugStrHead() {
-        return "" + Math.toDegrees(heading);
+    public void stop() {
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+    }
+
+    public void setDirection(Direction dir) {
+        if(dir == Direction.FORWARD) {
+            leftMotor.setDirection(DcMotor.Direction.FORWARD);
+            rightMotor.setDirection(DcMotor.Direction.REVERSE);
+        }
+        if(dir == Direction.REVERSE) {
+            leftMotor.setDirection(DcMotor.Direction.REVERSE);
+            rightMotor.setDirection(DcMotor.Direction.FORWARD);
+        }
+    }
+
+    public void resetState() {
+        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); //Stops robot and resets encoder
+        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); //Stops robot and resets encoder
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //Put motor back into driving mode
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //Put motor back into driving mode
+        path = new ArrayList<>(); //Creates a new empty ArrayList object
+        position = new Coord(0,0); //Sets starting position to (0,0)
+        heading = 0; //Set starting heading to 0 radians
+        seekerBit = false;
+        lastEncL = leftMotor.getCurrentPosition(); //Sets original encoder value to current
+        lastEncR = rightMotor.getCurrentPosition(); //Sets original encoder value to current
+    }
+
+    public void setSpeed(double speed) {
+        drivingSpeed = speed;
+    }
+
+    public void setStopBehavior(Stop type) {
+        if(type == Stop.BRAKE) {
+            leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
+        if(type == Stop.COAST) {
+            leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        }
+    }
+
+    public void setLeftMotorPower(double power) {
+        //Update state here
+        leftMotor.setPower(power);
+    }
+
+    public void setRightMotorPower(double power) {
+        //Update state here
+        rightMotor.setPower(power);
     }
 
     private void updateState(int deltaEncL, int deltaEncR) {
@@ -197,15 +252,17 @@ public class QWERTY {
 
     //Navigate to target point and return true if target has been reached
     private boolean moveTo(Coord coord) {
+        final double TOLERANCE = 2;
+
         //Define PID controller ratios
-        final double P = 0.4;
+        final double P = 0.5;
 
         //Get updated encoder position for both motors
         int leftEnc = leftMotor.getCurrentPosition();
         int rightEnc = rightMotor.getCurrentPosition();
 
         //If the robot is farther than 0.5cm away from the target position, drive to target.
-        if (position.distanceTo(coord) > 0.5) {
+        if (position.distanceTo(coord) > TOLERANCE) {
             //Calculate heading error and motor velocities
             double hError = headingError(heading,position.headingTo(coord));
             double lPower = drivingSpeed - (hError * P);

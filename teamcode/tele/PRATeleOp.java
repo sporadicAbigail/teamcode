@@ -3,44 +3,26 @@ package org.firstinspires.ftc.teamcode.tele;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.teamcode.hdwr.QWERTY;
+import org.firstinspires.ftc.teamcode.util.Direction;
+import org.firstinspires.ftc.teamcode.util.Stop;
 
 @TeleOp(name="PRATeleOp", group="TeleOp")
 public class PRATeleOp extends OpMode
 {
-    private DcMotor leftMotor;
-    private DcMotor rightMotor;
+    private QWERTY qwerty;
     private boolean reverseGear;
     private boolean reverseGearJP;
-
-    /*
-     * Code to run ONCE when the driver hits INIT
-     */
+    
     @Override
     public void init() {
+        this.qwerty = new QWERTY(hardwareMap);
         reverseGear = false;
         reverseGearJP = false;
-        leftMotor  = hardwareMap.dcMotor.get("L");
-        rightMotor = hardwareMap.dcMotor.get("R");
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
-    @Override
-    public void init_loop() {
-    }
-
-    /*
-     * Code to run ONCE when the driver hits PLAY
-     */
-    @Override
-    public void start() {
-
-    }
-
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
     @Override
     public void loop() {
         telemetry.addData("Gear", reverseGear ? " Reverse" : " Drive");
@@ -55,34 +37,19 @@ public class PRATeleOp extends OpMode
         double velocity = gamepad1.right_trigger;
         double steering = gamepad1.left_stick_x / 1.1;
 
-        if(reverseGear) {
-            leftMotor.setDirection(DcMotor.Direction.FORWARD);
-            rightMotor.setDirection(DcMotor.Direction.REVERSE);
-        }
-        else {
-            leftMotor.setDirection(DcMotor.Direction.REVERSE);
-            rightMotor.setDirection(DcMotor.Direction.FORWARD);
-        }
+        if(reverseGear)
+            qwerty.setDirection(Direction.REVERSE);
+        else
+            qwerty.setDirection(Direction.FORWARD);
 
         if(gamepad1.left_trigger > 0) {
-            leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            leftMotor.setPower(0);
-            rightMotor.setPower(0);
+            qwerty.setStopBehavior(Stop.BRAKE);
+            qwerty.stop();
         }
         else {
-            leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            leftMotor.setPower(velocity - steering);
-            rightMotor.setPower(velocity + steering);
+            qwerty.setStopBehavior(Stop.COAST);
+            qwerty.setLeftMotorPower(velocity - steering);
+            qwerty.setRightMotorPower(velocity + steering);
         }
     }
-
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
-    @Override
-    public void stop() {
-    }
-
 }
