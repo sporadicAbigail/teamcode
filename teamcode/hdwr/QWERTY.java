@@ -84,6 +84,7 @@ public class QWERTY {
         else {
             buttonServo.setPosition(SERVO_RIGHT);
         }
+        trackState();
         return false;
     }
 
@@ -93,6 +94,7 @@ public class QWERTY {
             rightMotor.setPower(0);
             return true;
         }
+        trackState();
         return false;
     }
 
@@ -108,6 +110,7 @@ public class QWERTY {
         }
         leftMotor.setPower(drivingSpeed);
         rightMotor.setPower(drivingSpeed);
+        trackState();
         return false;
     }
 
@@ -126,6 +129,7 @@ public class QWERTY {
             leftMotor.setPower(drivingSpeed);
             rightMotor.setPower(drivingSpeed);
         }
+        trackState();
     }
 
     public boolean iterateGTG() {
@@ -196,16 +200,22 @@ public class QWERTY {
     }
 
     public void setLeftMotorPower(double power) {
-        //Update state here
+        trackState();
         leftMotor.setPower(power);
     }
 
     public void setRightMotorPower(double power) {
-        //Update state here
+        trackState();
         rightMotor.setPower(power);
     }
 
-    private void updateState(int deltaEncL, int deltaEncR) {
+    private void trackState() {
+        //Get updated encoder position for both motors
+        int leftEnc = leftMotor.getCurrentPosition();
+        int rightEnc = rightMotor.getCurrentPosition();
+        int deltaEncL = leftEnc - lastEncL;
+        int deltaEncR = rightEnc - lastEncR;
+
         //Deduce the position of the left wheel based on central robot position and heading
         Coord lPos = new Coord(position.getX() + (Math.cos(heading + (Math.PI/2)) * DIFF_DRIVE_RADIUS), position.getY() + (Math.sin(heading + (Math.PI/2)) * DIFF_DRIVE_RADIUS));
         //Deduce the position of the right wheel based on central robot position and heading
@@ -232,6 +242,11 @@ public class QWERTY {
         //Calculate dirty (non-normalized) heading based on difference in wheel positions
         Vector wheelDiff = new Vector(lPos.difference(rPos));
         double dirtyHeading = Math.atan2(wheelDiff.getY(),wheelDiff.getX()) - (Math.PI / 2.0);
+
+        //Store current encoder values for delta calculation on next update
+        lastEncL = leftEnc;
+        lastEncR = rightEnc;
+
         //Normalize robot heading between [0,2PI)
         heading = (dirtyHeading > 0 ? dirtyHeading : dirtyHeading + 2 * Math.PI) % (2 * Math.PI);
     }
@@ -257,10 +272,6 @@ public class QWERTY {
         //Define PID controller ratios
         final double P = 0.5;
 
-        //Get updated encoder position for both motors
-        int leftEnc = leftMotor.getCurrentPosition();
-        int rightEnc = rightMotor.getCurrentPosition();
-
         //If the robot is farther than 0.5cm away from the target position, drive to target.
         if (position.distanceTo(coord) > TOLERANCE) {
             //Calculate heading error and motor velocities
@@ -273,16 +284,12 @@ public class QWERTY {
             rightMotor.setPower(rPower);
 
             //Update robot state based on change in encoder position
-            updateState(leftEnc-lastEncL,rightEnc-lastEncR);
-            //Store current encoder values for delta calculation on next update
-            lastEncL = leftEnc;
-            lastEncR = rightEnc;
+            trackState();
             return false;
         }
         // If the robot is closer than 0.5cm to its goal, stop motors and return true.
         else {
-            leftMotor.setPower(0);
-            rightMotor.setPower(0);
+            stop();
             return true;
         }
     }
