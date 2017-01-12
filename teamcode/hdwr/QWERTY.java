@@ -20,8 +20,8 @@ public class QWERTY {
     private final double DIFF_DRIVE_RADIUS = 16.5;
     private final double TICKS_PER_ROTATION = 1680.0;
     private final double SERVO_CENTER = 120;
-    private final double SERVO_LEFT = 80;
-    private final double SERVO_RIGHT = 160;
+    private final double SERVO_LEFT = 160;
+    private final double SERVO_RIGHT = 80;
 
     private TouchSensor frontTS;
 
@@ -287,9 +287,8 @@ public class QWERTY {
             trackState();
             return false;
         }
-        // If the robot is closer than 0.5cm to its goal, stop motors and return true.
+        // If the robot is closer than 0.5cm to its goal return true.
         else {
-            stop();
             return true;
         }
     }

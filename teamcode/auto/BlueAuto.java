@@ -30,7 +30,6 @@ public class BlueAuto extends OpMode {
                 state++;
                 break;
             case 1:
-                qwerty.setStopBehavior(Stop.COAST);
                 if(qwerty.iterateGTG())
                     state++;
             case 2:
@@ -38,7 +37,6 @@ public class BlueAuto extends OpMode {
                     state++;
                 break;
             case 3:
-                qwerty.setStopBehavior(Stop.BRAKE);
                 qwerty.iterateLineFollow();
                 if (qwerty.iterateWallSeek())
                     state++;

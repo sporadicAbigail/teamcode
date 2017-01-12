@@ -16,7 +16,8 @@ public class GTGoal extends OpMode {
 
     @Override
     public void loop() {
-        qwerty.iterateGTG();
+        if(qwerty.iterateGTG())
+            qwerty.stop();
         telemetry.addData("Postion: ", qwerty.debug("Position"));
         telemetry.addData("Heading: ", qwerty.debug("Heading"));
     }
