@@ -150,6 +150,10 @@ public class QWERTY {
                 return "(" + position.getX() + "," + position.getY() + ")";
             case "Heading":
                 return "" + Math.toDegrees(heading);
+            case "ColorLeft":
+                return "R - " + leftCS.red() + " G - " + leftCS.green() + " B - " + leftCS.blue();
+            case "ColorRight":
+                return "R - " + rightCS.red() + " G - " + rightCS.green() + " B - " + rightCS.blue();
             default:
                 return "That is not a valid debug parameter.";
         }
