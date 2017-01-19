@@ -19,9 +19,9 @@ public class QWERTY {
     private final double WHEEL_DIAMETER = 8.5;
     private final double DIFF_DRIVE_RADIUS = 16.5;
     private final double TICKS_PER_ROTATION = 1680.0;
-    private final double SERVO_CENTER = 120;
-    private final double SERVO_LEFT = 160;
-    private final double SERVO_RIGHT = 80;
+    private final double SERVO_CENTER = 0.5;
+    private final double SERVO_LEFT = 0.0;
+    private final double SERVO_RIGHT = 1.0;
 
     private TouchSensor frontTS;
 
@@ -34,7 +34,8 @@ public class QWERTY {
     private DcMotor leftMotor;
     private DcMotor rightMotor;
 
-    private Servo buttonServo;
+    // Stop this evil
+    public Servo buttonServo;
 
     private int lastEncL;
     private int lastEncR;
@@ -71,14 +72,14 @@ public class QWERTY {
     public boolean iteratePushButton(Color goal) {
         Color leftColor = (leftCS.red() > leftCS.blue()) ? Color.RED : Color.BLUE;
         Color rightColor = (rightCS.red() > rightCS.blue()) ? Color.RED : Color.BLUE;
-        if(leftColor == rightColor && leftColor == goal) {
+        if(leftColor.equals(rightColor) && leftColor.equals(goal)) {
             buttonServo.setPosition(SERVO_CENTER);
             return true;
         }
-        else if(leftColor == rightColor) {
+        else if(leftColor.equals(rightColor)) {
             buttonServo.setPosition(SERVO_LEFT);
         }
-        else if(leftColor == goal) {
+        else if(leftColor.equals(goal)) {
             buttonServo.setPosition(SERVO_LEFT);
         }
         else {
@@ -150,9 +151,13 @@ public class QWERTY {
                 return "(" + position.getX() + "," + position.getY() + ")";
             case "Heading":
                 return "" + Math.toDegrees(heading);
-            case "ColorLeft":
+            case "Color":
+                Color leftColor = (leftCS.red() > leftCS.blue()) ? Color.RED : Color.BLUE;
+                Color rightColor = (rightCS.red() > rightCS.blue()) ? Color.RED : Color.BLUE;
+                return "L - " + leftColor + " R - " + rightColor;
+            case "ColorRawLeft":
                 return "R - " + leftCS.red() + " G - " + leftCS.green() + " B - " + leftCS.blue();
-            case "ColorRight":
+            case "ColorRawRight":
                 return "R - " + rightCS.red() + " G - " + rightCS.green() + " B - " + rightCS.blue();
             default:
                 return "That is not a valid debug parameter.";
@@ -180,6 +185,7 @@ public class QWERTY {
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); //Stops robot and resets encoder
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //Put motor back into driving mode
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //Put motor back into driving mode
+        buttonServo.setPosition(SERVO_CENTER); //Center the servo for the button pusher
         path = new ArrayList<>(); //Creates a new empty ArrayList object
         position = new Coord(0,0); //Sets starting position to (0,0)
         heading = 0; //Set starting heading to 0 radians

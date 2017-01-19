@@ -16,15 +16,17 @@ public class BlueAuto extends OpMode {
     public void init() {
         this.qwerty = new QWERTY(hardwareMap);
         qwerty.setSpeed(0.25);
-        state = 5;
+        state = 0;
     }
     @Override
     public void loop() {
         telemetry.addData("State:",state);
         telemetry.addData("Position:",qwerty.debug("Position"));
         telemetry.addData("Heading:", qwerty.debug("Heading"));
-        telemetry.addData("Color Left:", qwerty.debug("ColorLeft"));
-        telemetry.addData("Color Right:", qwerty.debug("ColorRight"));
+        telemetry.addData("Color:", qwerty.debug("Color"));
+        telemetry.addData("Left Color:", qwerty.debug("ColorRawLeft"));
+        telemetry.addData("Right Color:", qwerty.debug("ColorRawRight"));
+        telemetry.addData("Servo Position:", qwerty.buttonServo.getPosition());
         switch (state) {
             case 0:
                 qwerty.pushCoord(25,0);
@@ -49,6 +51,7 @@ public class BlueAuto extends OpMode {
                 break;
             case 5:
                 break;
+
             default:
                 stop();
         }
