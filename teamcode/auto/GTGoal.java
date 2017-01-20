@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.hdwr.QWERTY;
+import org.firstinspires.ftc.teamcode.util.Direction;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 @Autonomous(name = "GTGoal", group = "Autonomous")
@@ -16,7 +18,7 @@ public class GTGoal extends OpMode {
 
     @Override
     public void loop() {
-        if(qwerty.iterateGTG())
+        if(qwerty.iterateGTG(Direction.FORWARD))
             qwerty.stop();
         telemetry.addData("Postion: ", qwerty.debug("Position"));
         telemetry.addData("Heading: ", qwerty.debug("Heading"));

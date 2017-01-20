@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.hdwr.QWERTY;
 import org.firstinspires.ftc.teamcode.util.Color;
+import org.firstinspires.ftc.teamcode.util.Direction;
 import org.firstinspires.ftc.teamcode.util.Stop;
 
 @Autonomous(name = "Blue Team Alliance", group = "Autonomous")
@@ -15,7 +16,7 @@ public class BlueAuto extends OpMode {
     @Override
     public void init() {
         this.qwerty = new QWERTY(hardwareMap);
-        qwerty.setSpeed(0.25);
+        qwerty.setSpeed(0.35);
         state = 0;
     }
     @Override
@@ -26,15 +27,14 @@ public class BlueAuto extends OpMode {
         telemetry.addData("Color:", qwerty.debug("Color"));
         telemetry.addData("Left Color:", qwerty.debug("ColorRawLeft"));
         telemetry.addData("Right Color:", qwerty.debug("ColorRawRight"));
-        telemetry.addData("Servo Position:", qwerty.buttonServo.getPosition());
         switch (state) {
             case 0:
                 qwerty.pushCoord(25,0);
-                qwerty.pushCoord(100,-75);
+                qwerty.pushCoord(100,-60);
                 state++;
                 break;
             case 1:
-                if(qwerty.iterateGTG())
+                if(qwerty.iterateGTG(Direction.FORWARD))
                     state++;
             case 2:
                 if (qwerty.iterateLineSeek())
@@ -50,9 +50,15 @@ public class BlueAuto extends OpMode {
                     state++;
                 break;
             case 5:
+                qwerty.pushCoord(130,-60);
+                state++;
                 break;
-
+            case 6:
+                if(qwerty.iterateGTG(Direction.REVERSE))
+                    state++;
+                break;
             default:
+                qwerty.stop();
                 stop();
         }
     }

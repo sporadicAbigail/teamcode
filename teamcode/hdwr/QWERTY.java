@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.hdwr;
 
+import android.graphics.CornerPathEffect;
+
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -20,8 +23,8 @@ public class QWERTY {
     private final double DIFF_DRIVE_RADIUS = 16.5;
     private final double TICKS_PER_ROTATION = 1680.0;
     private final double SERVO_CENTER = 0.5;
-    private final double SERVO_LEFT = 0.0;
-    private final double SERVO_RIGHT = 1.0;
+    private final double SERVO_LEFT = 0.1;
+    private final double SERVO_RIGHT = 0.9;
 
     private TouchSensor frontTS;
 
@@ -34,8 +37,7 @@ public class QWERTY {
     private DcMotor leftMotor;
     private DcMotor rightMotor;
 
-    // Stop this evil
-    public Servo buttonServo;
+    private Servo buttonServo;
 
     private int lastEncL;
     private int lastEncR;
@@ -133,9 +135,9 @@ public class QWERTY {
         trackState();
     }
 
-    public boolean iterateGTG() {
+    public boolean iterateGTG(Direction dir) {
         if (!path.isEmpty()) {
-            if (moveTo(path.get(0))) {
+            if (moveTo(path.get(0), dir)) {
                 path.remove(0);
             }
             return false;
@@ -170,11 +172,11 @@ public class QWERTY {
     }
 
     public void setDirection(Direction dir) {
-        if(dir == Direction.FORWARD) {
+        if(dir == Direction.FORWARD && rightMotor.getDirection() != DcMotor.Direction.REVERSE) {
             leftMotor.setDirection(DcMotor.Direction.FORWARD);
             rightMotor.setDirection(DcMotor.Direction.REVERSE);
         }
-        if(dir == Direction.REVERSE) {
+        if(dir == Direction.REVERSE && leftMotor.getDirection() != DcMotor.Direction.REVERSE) {
             leftMotor.setDirection(DcMotor.Direction.REVERSE);
             rightMotor.setDirection(DcMotor.Direction.FORWARD);
         }
@@ -276,19 +278,31 @@ public class QWERTY {
     }
 
     //Navigate to target point and return true if target has been reached
-    private boolean moveTo(Coord coord) {
+    private boolean moveTo(Coord coord, Direction dir) {
         final double TOLERANCE = 2;
 
         //Define PID controller ratios
         final double P = 0.5;
 
-        //If the robot is farther than 0.5cm away from the target position, drive to target.
+        //If the robot is farther than 2cm away from the target position, drive to target.
         if (position.distanceTo(coord) > TOLERANCE) {
-            //Calculate heading error and motor velocities
-            double hError = headingError(heading,position.headingTo(coord));
-            double lPower = drivingSpeed - (hError * P);
-            double rPower = drivingSpeed + (hError * P);
-
+            double hError;
+            double lPower;
+            double rPower;
+            if (dir == Direction.FORWARD) {
+                //Calculate heading error and motor velocities
+                hError = headingError(heading, position.headingTo(coord));
+                lPower = drivingSpeed - (hError * P);
+                rPower = drivingSpeed + (hError * P);
+            }
+            else {
+                //Calculate heading error and motor velocities
+                double dirtyHeading = heading + Math.PI;
+                double reverseHeading =  (dirtyHeading > 0 ? dirtyHeading : dirtyHeading + 2 * Math.PI) % (2 * Math.PI);
+                hError = headingError(reverseHeading, position.headingTo(coord));
+                lPower = - drivingSpeed + (hError * P);
+                rPower = - drivingSpeed - (hError * P);
+            }
             //Set motor velocities
             leftMotor.setPower(lPower);
             rightMotor.setPower(rPower);
