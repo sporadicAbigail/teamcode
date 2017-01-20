@@ -279,7 +279,7 @@ public class QWERTY {
 
     //Navigate to target point and return true if target has been reached
     private boolean moveTo(Coord coord, Direction dir) {
-        final double TOLERANCE = 2;
+        final double TOLERANCE = 3;
 
         //Define PID controller ratios
         final double P = 0.5;
@@ -300,8 +300,8 @@ public class QWERTY {
                 double dirtyHeading = heading + Math.PI;
                 double reverseHeading =  (dirtyHeading > 0 ? dirtyHeading : dirtyHeading + 2 * Math.PI) % (2 * Math.PI);
                 hError = headingError(reverseHeading, position.headingTo(coord));
-                lPower = - drivingSpeed + (hError * P);
-                rPower = - drivingSpeed - (hError * P);
+                lPower = - drivingSpeed - (hError * P);
+                rPower = - drivingSpeed + (hError * P);
             }
             //Set motor velocities
             leftMotor.setPower(lPower);

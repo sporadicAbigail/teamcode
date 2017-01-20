@@ -57,6 +57,27 @@ public class BlueAuto extends OpMode {
                 if(qwerty.iterateGTG(Direction.REVERSE))
                     state++;
                 break;
+            case 7:
+                qwerty.pushCoord(230, -100);
+                state++;
+                break;
+            case 8:
+                if(qwerty.iterateGTG(Direction.FORWARD))
+                    state++;
+                break;
+            case 9:
+                if (qwerty.iterateLineSeek())
+                    state++;
+                break;
+            case 10:
+                qwerty.iterateLineFollow();
+                if (qwerty.iterateWallSeek())
+                    state++;
+                break;
+            case 11:
+                if(qwerty.iteratePushButton(Color.BLUE))
+                    state++;
+                break;
             default:
                 qwerty.stop();
                 stop();
