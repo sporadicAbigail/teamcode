@@ -50,7 +50,7 @@ public class BlueAuto extends OpMode {
                     state++;
                 break;
             case 5:
-                qwerty.pushCoord(130,-60);
+                qwerty.pushCoord(130,-50);
                 state++;
                 break;
             case 6:
