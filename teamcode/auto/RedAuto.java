@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.util.Color;
 import org.firstinspires.ftc.teamcode.util.Direction;
 import org.firstinspires.ftc.teamcode.util.Stop;
 
-@Autonomous(name = "BlueAuto", group = "Autonomous")
-public class BlueAuto extends OpMode {
+@Autonomous(name = "RedAuto", group = "Autonomous")
+public class RedAuto extends OpMode {
     private QWERTY qwerty;
     private int state;
 
@@ -30,7 +30,7 @@ public class BlueAuto extends OpMode {
         switch (state) {
             case 0:
                 qwerty.pushCoord(25,0);
-                qwerty.pushCoord(100,-60);
+                qwerty.pushCoord(100,60);
                 state++;
                 break;
             case 1:
@@ -46,11 +46,11 @@ public class BlueAuto extends OpMode {
                     state++;
                 break;
             case 4:
-                if(qwerty.iteratePushButton(Color.BLUE))
+                if(qwerty.iteratePushButton(Color.RED))
                     state++;
                 break;
             case 5:
-                qwerty.pushCoord(130,-60);
+                qwerty.pushCoord(130,60);
                 state++;
                 break;
             case 6:
@@ -58,7 +58,7 @@ public class BlueAuto extends OpMode {
                     state++;
                 break;
             case 7:
-                qwerty.pushCoord(230, -100);
+                qwerty.pushCoord(230, 100);
                 state++;
                 break;
             case 8:
@@ -75,11 +75,11 @@ public class BlueAuto extends OpMode {
                     state++;
                 break;
             case 11:
-                if(qwerty.iteratePushButton(Color.BLUE))
+                if(qwerty.iteratePushButton(Color.RED))
                     state++;
                 break;
             case 12:
-                qwerty.pushCoord(260, -115);
+                qwerty.pushCoord(260, 115);
                 state++;
                 break;
             case 13:

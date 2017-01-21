@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode.hdwr;
 
-import android.graphics.CornerPathEffect;
-
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -23,8 +20,8 @@ public class QWERTY {
     private final double DIFF_DRIVE_RADIUS = 16.5;
     private final double TICKS_PER_ROTATION = 1680.0;
     private final double SERVO_CENTER = 0.5;
-    private final double SERVO_LEFT = 0.1;
-    private final double SERVO_RIGHT = 0.9;
+    private final double SERVO_LEFT = 0.0;
+    private final double SERVO_RIGHT = 1.0;
 
     private TouchSensor frontTS;
 
@@ -164,6 +161,10 @@ public class QWERTY {
             default:
                 return "That is not a valid debug parameter.";
         }
+    }
+
+    public void centerServo() {
+        buttonServo.setPosition(SERVO_CENTER);
     }
 
     public void stop() {
