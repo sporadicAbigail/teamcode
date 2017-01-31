@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class QWERTY {
     private final double WHEEL_DIAMETER = 8.5;
     private final double DIFF_DRIVE_RADIUS = 16.5;
-    private final double TICKS_PER_ROTATION = 1680.0;
+    private final double TICKS_PER_ROTATION = 1120.0;
     private final double SERVO_CENTER = 0.5;
     private final double SERVO_LEFT = 0.0;
     private final double SERVO_RIGHT = 1.0;
@@ -45,6 +45,7 @@ public class QWERTY {
     //Declare autonomous parameters:
     private ArrayList<Coord> path; //Stores the robot's desired route.
     private double drivingSpeed;
+    private double lineDrivingSpeed;
     private boolean seekerBit;
 
 
@@ -52,8 +53,8 @@ public class QWERTY {
         frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
         leftLS = hdwrMap.lightSensor.get("LS0"); //Set 'leftLS' to the sensor 'LS0' from the HardwareMap
         rightLS = hdwrMap.lightSensor.get("LS1"); //Set 'rightLS' to the sensor 'LS1' from the HardwareMap
-        leftLS.enableLed(false); //Turn off LED
-        rightLS.enableLed(false); //Turn off LED
+        leftLS.enableLed(true); //Turn off LED
+        rightLS.enableLed(true); //Turn off LED
         leftCS = hdwrMap.colorSensor.get("CS0"); //Set 'rightCS' to the sensor 'CS0' from the HardwareMap
         rightCS = hdwrMap.colorSensor.get("CS1"); //Set 'rightCS' to the sensor 'CS0' from the HardwareMap
         leftMotor = hdwrMap.dcMotor.get("L"); //Set 'leftMotor' to the motor 'L' from the HardwareMap
@@ -115,19 +116,19 @@ public class QWERTY {
     }
 
     public void iterateLineFollow() {
-        final double TOLERANCE = 0.05;
+        final double TOLERANCE = 0.08;
         double sensorDiff = leftLS.getLightDetected() - rightLS.getLightDetected();
         if(sensorDiff > TOLERANCE) {
-            leftMotor.setPower(drivingSpeed);
-            rightMotor.setPower(-drivingSpeed);
+            leftMotor.setPower(lineDrivingSpeed);
+            rightMotor.setPower(-lineDrivingSpeed);
         }
         else if(sensorDiff < -TOLERANCE) {
-            leftMotor.setPower(-drivingSpeed);
-            rightMotor.setPower(drivingSpeed);
+            leftMotor.setPower(-lineDrivingSpeed);
+            rightMotor.setPower(lineDrivingSpeed);
         }
         else {
-            leftMotor.setPower(drivingSpeed);
-            rightMotor.setPower(drivingSpeed);
+            leftMotor.setPower(lineDrivingSpeed);
+            rightMotor.setPower(lineDrivingSpeed);
         }
         trackState();
     }
@@ -199,6 +200,7 @@ public class QWERTY {
 
     public void setSpeed(double speed) {
         drivingSpeed = speed;
+        lineDrivingSpeed = speed / 2.0;
     }
 
     public void setStopBehavior(Stop type) {
