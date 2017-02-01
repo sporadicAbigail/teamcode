@@ -16,7 +16,7 @@ public class RedAuto extends OpMode {
     @Override
     public void init() {
         this.qwerty = new QWERTY(hardwareMap);
-        qwerty.setSpeed(0.35);
+        qwerty.setSpeed(0.3);
         state = 0;
     }
     @Override
@@ -57,7 +57,7 @@ public class RedAuto extends OpMode {
                     state++;
                 break;
             case 7:
-                qwerty.pushCoord(230, 95);
+                qwerty.pushCoord(230, 85);
                 state++;
                 break;
             case 8:

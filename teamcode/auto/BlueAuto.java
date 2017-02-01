@@ -16,7 +16,7 @@ public class BlueAuto extends OpMode {
     @Override
     public void init() {
         this.qwerty = new QWERTY(hardwareMap);
-        qwerty.setSpeed(0.35);
+        qwerty.setSpeed(0.3);
         state = 0;
     }
     @Override

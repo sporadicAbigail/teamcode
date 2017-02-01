@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.hdwr;
 
+import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.Color;
 import org.firstinspires.ftc.teamcode.util.Coord;
@@ -46,7 +48,12 @@ public class QWERTY {
     private ArrayList<Coord> path; //Stores the robot's desired route.
     private double drivingSpeed;
     private double lineDrivingSpeed;
+    private int retryAttempts;
+    private double retryInterval;
+    private int retryAttemptsBit;
     private boolean seekerBit;
+    private boolean retryBit;
+    private ElapsedTime timer;
 
 
     public QWERTY(HardwareMap hdwrMap) {
@@ -63,6 +70,12 @@ public class QWERTY {
         setDirection(Direction.FORWARD);
         resetState();
         setSpeed(0.5);
+        retryAttempts = 3;
+        retryInterval = 2000;
+        timer = new ElapsedTime();
+        timer.reset();
+        retryAttemptsBit = 0;
+        retryBit = false;
     }
 
     public void pushCoord(double xCoord, double yCoord) {
@@ -72,18 +85,33 @@ public class QWERTY {
     public boolean iteratePushButton(Color goal) {
         Color leftColor = (leftCS.red() > leftCS.blue()) ? Color.RED : Color.BLUE;
         Color rightColor = (rightCS.red() > rightCS.blue()) ? Color.RED : Color.BLUE;
-        if(leftColor.equals(rightColor) && leftColor.equals(goal)) {
-            buttonServo.setPosition(SERVO_CENTER);
+
+        if(retryAttemptsBit == retryAttempts) {
+            retryAttemptsBit = 0;
+            retryBit = false;
             return true;
         }
-        else if(leftColor.equals(rightColor)) {
-            buttonServo.setPosition(SERVO_LEFT);
+        else if (leftColor.equals(rightColor) && leftColor.equals(goal)) {
+                buttonServo.setPosition(SERVO_CENTER);
+                retryAttemptsBit = 0;
+                retryBit = false;
+                return true;
         }
-        else if(leftColor.equals(goal)) {
-            buttonServo.setPosition(SERVO_LEFT);
+        else if(timer.milliseconds() > retryInterval) {
+            timer.reset();
+            retryBit = false;
+            if (leftColor.equals(rightColor)) {
+                buttonServo.setPosition(SERVO_LEFT);
+            } else if (leftColor.equals(goal)) {
+                buttonServo.setPosition(SERVO_LEFT);
+            } else {
+                buttonServo.setPosition(SERVO_RIGHT);
+            }
         }
-        else {
-            buttonServo.setPosition(SERVO_RIGHT);
+        else if (!retryBit && timer.milliseconds() > retryInterval / 2) {
+            buttonServo.setPosition(SERVO_CENTER);
+            retryBit = true;
+            retryAttemptsBit++;
         }
         trackState();
         return false;
