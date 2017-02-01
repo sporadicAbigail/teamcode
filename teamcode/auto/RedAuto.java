@@ -78,13 +78,22 @@ public class RedAuto extends OpMode {
                     state++;
                 break;
             case 12:
-                qwerty.pushCoord(250, 90);
+                qwerty.pushCoord(255, 80);
                 state++;
                 break;
             case 13:
                 if(qwerty.iterateGTG(Direction.REVERSE))
                     state++;
                 break;
+            /*case 14:
+                qwerty.pushCoord(155, -25);
+                state++;
+                break;
+            case 15:
+                if(qwerty.iterateGTG(Direction.FORWARD))
+                    state++;
+                break;
+            */
             default:
                 qwerty.stop();
                 stop();
