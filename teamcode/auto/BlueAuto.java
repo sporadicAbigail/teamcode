@@ -29,7 +29,7 @@ public class BlueAuto extends OpMode {
         telemetry.addData("Right Color:", qwerty.debug("ColorRawRight"));
         switch (state) {
             case 0:
-                qwerty.pushCoord(100,-70);
+                qwerty.pushCoord(100,-75);
                 state++;
                 break;
             case 1:
@@ -57,7 +57,7 @@ public class BlueAuto extends OpMode {
                     state++;
                 break;
             case 7:
-                qwerty.pushCoord(230, -85);
+                qwerty.pushCoord(230, -80);
                 state++;
                 break;
             case 8:
@@ -78,7 +78,7 @@ public class BlueAuto extends OpMode {
                     state++;
                 break;
             case 12:
-                qwerty.pushCoord(260, -90);
+                qwerty.pushCoord(250, -90);
                 state++;
                 break;
             case 13:

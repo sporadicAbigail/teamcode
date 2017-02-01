@@ -55,7 +55,6 @@ public class QWERTY {
     private boolean retryBit;
     private ElapsedTime timer;
 
-
     public QWERTY(HardwareMap hdwrMap) {
         frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
         leftLS = hdwrMap.lightSensor.get("LS0"); //Set 'leftLS' to the sensor 'LS0' from the HardwareMap
@@ -71,7 +70,7 @@ public class QWERTY {
         resetState();
         setSpeed(0.5);
         retryAttempts = 3;
-        retryInterval = 2000;
+        retryInterval = 1500;
         timer = new ElapsedTime();
         timer.reset();
         retryAttemptsBit = 0;
