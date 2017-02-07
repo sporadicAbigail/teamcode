@@ -33,6 +33,7 @@ public class CalibrateLightSensors extends LinearOpMode {
 	    qwerty.setRightMotorPower(velocity - steering);
 
             telemetry.addData("Light Reading: ", qwerty.debug("Light"));
+	    telemetry.update();
         }
     }
 }
