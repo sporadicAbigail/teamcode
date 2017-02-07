@@ -26,6 +26,9 @@ public class CalibrateLightSensors extends LinearOpMode {
 	boolean lightSwitchCurr = false;
 	boolean lightSwitch = true;
 
+        telemetry.addData("FYI: Light Sensor Max Raw values are: ", qwerty.debug("RawLightMax"));
+	telemetry.update();
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
@@ -46,8 +49,7 @@ public class CalibrateLightSensors extends LinearOpMode {
 
 	    if ((lightSwitchCurr == true) && (lightSwitchCurr != lightSwitchPrev)) {
                 lightSwitch = !lightSwitch;
-		QWERTY.leftLS.enableLed(lightSwitch); // will this even work?
-		QWERTY.rightLS.enableLed(lightSwitch);
+		qwerty.toggleLightLeds(lightSwitch);
 	    }
 	    lightSwitchPrev = lightSwitchCurr;
 

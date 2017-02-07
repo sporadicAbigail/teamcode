@@ -190,6 +190,8 @@ public class QWERTY {
 		return "L - " + leftLS.getLightDetected() + " R - " + rightLS.getLightDetected();
             case "RawLight":
 		return "L - " + leftLS.getRawLightDetected() + " R - " + rightLS.getRawLightDetected();
+            case "RawLightMax":
+		return "L - " + leftLS.getRawLightDetectedMax() + " R - " + rightLS.getRawLightDetectedMax();
             case "LightThreshold":
 		return "" + ((leftLS.getRawLightDetected() + rightLS.getRawLightDetected()) / 2);
             default:
@@ -255,6 +257,11 @@ public class QWERTY {
     public void setRightMotorPower(double power) {
         trackState();
         rightMotor.setPower(power);
+    }
+
+    public void toggleLightLeds(boolean onOff) {
+        leftLS.enableLed(onOff);
+        rightLS.enableLed(onOff);
     }
 
     private void trackState() {
