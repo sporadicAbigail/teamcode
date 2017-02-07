@@ -32,6 +32,7 @@ public class BlueTeleOp extends OpMode
     @Override
     public void loop() {
         telemetry.addData("Gear", reverseGear ? " Reverse" : " Drive");
+        telemetry.addData("Light Values:", qwerty.debug("LightSensors"));
         switch (state) {
             case 0:
                 if (gamepad1.right_bumper && !reverseGearJP) {

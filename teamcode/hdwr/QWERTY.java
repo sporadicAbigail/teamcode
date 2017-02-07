@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.util.Stop;
 import org.firstinspires.ftc.teamcode.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class QWERTY {
     private final double WHEEL_DIAMETER = 8.5;
@@ -59,8 +60,8 @@ public class QWERTY {
         frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
         leftLS = hdwrMap.lightSensor.get("LS0"); //Set 'leftLS' to the sensor 'LS0' from the HardwareMap
         rightLS = hdwrMap.lightSensor.get("LS1"); //Set 'rightLS' to the sensor 'LS1' from the HardwareMap
-        leftLS.enableLed(true); //Turn off LED
-        rightLS.enableLed(true); //Turn off LED
+        leftLS.enableLed(false); //Turn off LED
+        rightLS.enableLed(false); //Turn off LED
         leftCS = hdwrMap.colorSensor.get("CS0"); //Set 'rightCS' to the sensor 'CS0' from the HardwareMap
         rightCS = hdwrMap.colorSensor.get("CS1"); //Set 'rightCS' to the sensor 'CS0' from the HardwareMap
         leftMotor = hdwrMap.dcMotor.get("L"); //Set 'leftMotor' to the motor 'L' from the HardwareMap
@@ -127,7 +128,7 @@ public class QWERTY {
     }
 
     public boolean iterateLineSeek() {
-        final double TOLERANCE = 0.75;
+        final double TOLERANCE = 0.06;
         double sensorDiff = leftLS.getLightDetected() - rightLS.getLightDetected();
         if(!seekerBit && Math.abs(sensorDiff) > TOLERANCE) {
             seekerBit = true;
@@ -143,7 +144,7 @@ public class QWERTY {
     }
 
     public void iterateLineFollow() {
-        final double TOLERANCE = 0.075;
+        final double TOLERANCE = 0.06;
         double sensorDiff = leftLS.getLightDetected() - rightLS.getLightDetected();
         if(sensorDiff > TOLERANCE) {
             leftMotor.setPower(lineDrivingSpeed);
@@ -175,9 +176,9 @@ public class QWERTY {
     public String debug(String str) {
         switch(str) {
             case "Position":
-                return "(" + position.getX() + "," + position.getY() + ")";
+                return "(" + String.format(Locale.US,"%.2f", position.getX()) + "," + String.format(Locale.US,"%.2f", position.getY()) + ")";
             case "Heading":
-                return "" + Math.toDegrees(heading);
+                return "" + String.format(Locale.US,"%.2f", Math.toDegrees(heading));
             case "Color":
                 Color leftColor = (leftCS.red() > leftCS.blue()) ? Color.RED : Color.BLUE;
                 Color rightColor = (rightCS.red() > rightCS.blue()) ? Color.RED : Color.BLUE;
@@ -187,7 +188,7 @@ public class QWERTY {
             case "ColorRawRight":
                 return "R - " + rightCS.red() + " G - " + rightCS.green() + " B - " + rightCS.blue();
             case "LightSensors":
-                return "L - " + leftLS.getLightDetected() + " R - " + rightLS.getLightDetected();
+                return "L - " + String.format(Locale.US,"%.2f", leftLS.getLightDetected()) + " R - " + String.format(Locale.US,"%.2f", rightLS.getLightDetected());
             default:
                 return "That is not a valid debug parameter.";
         }
@@ -311,7 +312,7 @@ public class QWERTY {
 
     //Navigate to target point and return true if target has been reached
     private boolean moveTo(Coord coord, Direction dir) {
-        final double TOLERANCE = 3;
+        final double TOLERANCE = 2;
 
         //Define PID controller ratios
         final double P = 0.5;
