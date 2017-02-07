@@ -188,6 +188,8 @@ public class QWERTY {
                 return "R - " + rightCS.red() + " G - " + rightCS.green() + " B - " + rightCS.blue();
             case "Light":
 		return "L - " + leftLS.getLightDetected() + " R - " + rightLS.getLightDetected();
+            case "RawLight":
+		return "L - " + leftLS.getRawLightDetected() + " R - " + rightLS.getRawLightDetected();
             default:
                 return "That is not a valid debug parameter.";
         }
