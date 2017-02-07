@@ -127,7 +127,7 @@ public class QWERTY {
     }
 
     public boolean iterateLineSeek() {
-        final double TOLERANCE = 0.05;
+        final double TOLERANCE = 0.75;
         double sensorDiff = leftLS.getLightDetected() - rightLS.getLightDetected();
         if(!seekerBit && Math.abs(sensorDiff) > TOLERANCE) {
             seekerBit = true;
@@ -143,7 +143,7 @@ public class QWERTY {
     }
 
     public void iterateLineFollow() {
-        final double TOLERANCE = 0.08;
+        final double TOLERANCE = 0.075;
         double sensorDiff = leftLS.getLightDetected() - rightLS.getLightDetected();
         if(sensorDiff > TOLERANCE) {
             leftMotor.setPower(lineDrivingSpeed);
@@ -186,6 +186,8 @@ public class QWERTY {
                 return "R - " + leftCS.red() + " G - " + leftCS.green() + " B - " + leftCS.blue();
             case "ColorRawRight":
                 return "R - " + rightCS.red() + " G - " + rightCS.green() + " B - " + rightCS.blue();
+            case "LightSensors":
+                return "L - " + leftLS.getLightDetected() + " R - " + rightLS.getLightDetected();
             default:
                 return "That is not a valid debug parameter.";
         }

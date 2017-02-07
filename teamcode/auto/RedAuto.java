@@ -25,6 +25,7 @@ public class RedAuto extends OpMode {
         telemetry.addData("Position:",qwerty.debug("Position"));
         telemetry.addData("Heading:", qwerty.debug("Heading"));
         telemetry.addData("Color:", qwerty.debug("Color"));
+        telemetry.addData("Light Sensors:", qwerty.debug("LightSensors"));
         telemetry.addData("Left Color:", qwerty.debug("ColorRawLeft"));
         telemetry.addData("Right Color:", qwerty.debug("ColorRawRight"));
         switch (state) {
