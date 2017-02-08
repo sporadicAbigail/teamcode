@@ -12,7 +12,7 @@ function pullLink {
 
 if [ ! -d $PWD/ftc_app-master ]
   then pullLink  
-  else echo -n "ftc_app-master already exists, would you like to redownload it? (y/n): "
+  else echo -n "ftc_app already exists, would you like to redownload it? (y/n): "
        read ui
        if [ $ui = "y" -o $ui = "Y" ]
          then rm -r $PWD/ftc_app-master
