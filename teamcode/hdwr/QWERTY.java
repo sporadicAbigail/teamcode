@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.hdwr;
 
-import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -252,6 +251,11 @@ public class QWERTY {
     public void setRightMotorPower(double power) {
         trackState();
         rightMotor.setPower(power);
+    }
+
+    public void toggleLightLeds(boolean onOff) {
+        leftLS.enableLed(onOff);
+        rightLS.enableLed(onOff);
     }
 
     private void trackState() {
