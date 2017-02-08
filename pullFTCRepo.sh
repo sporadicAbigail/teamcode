@@ -7,7 +7,7 @@ function pullLink {
   unzip $PWD/ftc_app.zip
   rm $PWD/ftc_app.zip
   rm -r $PWD/ftc_app-master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode
-  ln -s $PWD/teamcode $PWD/ftc_app-master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode
+  cp -r $PWD/teamcode $PWD/ftc_app-master/TeamCode/src/main/java/org/firstinspires/ftc/
 }
 
 if [ ! -d $PWD/ftc_app-master ]
