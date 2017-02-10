@@ -146,12 +146,12 @@ public class QWERTY {
         final double TOLERANCE = 0.06;
         double sensorDiff = leftLS.getLightDetected() - rightLS.getLightDetected();
         if(sensorDiff > TOLERANCE) {
-            leftMotor.setPower(lineDrivingSpeed);
-            rightMotor.setPower(-lineDrivingSpeed);
-        }
-        else if(sensorDiff < -TOLERANCE) {
             leftMotor.setPower(-lineDrivingSpeed);
             rightMotor.setPower(lineDrivingSpeed);
+        }
+        else if(sensorDiff < -TOLERANCE) {
+            leftMotor.setPower(lineDrivingSpeed);
+            rightMotor.setPower(-lineDrivingSpeed);
         }
         else {
             leftMotor.setPower(lineDrivingSpeed);
