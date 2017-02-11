@@ -24,6 +24,7 @@ public class QWERTY {
     private final double SERVO_CENTER = 0.5;
     private final double SERVO_LEFT = 0.0;
     private final double SERVO_RIGHT = 1.0;
+    private final double LIGHT_CALIBRATE = 0.05;
 
     private TouchSensor frontTS;
 
@@ -46,6 +47,7 @@ public class QWERTY {
 
     //Declare autonomous parameters:
     private ArrayList<Coord> path; //Stores the robot's desired route.
+    private Coord origin;
     private double drivingSpeed;
     private double lineDrivingSpeed;
     private int retryAttempts;
@@ -55,7 +57,7 @@ public class QWERTY {
     private boolean retryBit;
     private ElapsedTime timer;
 
-    public QWERTY(HardwareMap hdwrMap) {
+    public QWERTY(HardwareMap hdwrMap, double startX, double startY) {
         frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
         leftLS = hdwrMap.lightSensor.get("LS0"); //Set 'leftLS' to the sensor 'LS0' from the HardwareMap
         rightLS = hdwrMap.lightSensor.get("LS1"); //Set 'rightLS' to the sensor 'LS1' from the HardwareMap
@@ -66,6 +68,7 @@ public class QWERTY {
         leftMotor = hdwrMap.dcMotor.get("L"); //Set 'leftMotor' to the motor 'L' from the HardwareMap
         rightMotor = hdwrMap.dcMotor.get("R"); //Set 'rightMotor' to the motor 'R' from the HardwareMap
         buttonServo = hdwrMap.servo.get("BS"); //Set 'buttonServo' to the sensor 'BS' from the HardwareMap
+        origin = new Coord(startX,startY);
         setDirection(Direction.FORWARD);
         resetState();
         setSpeed(0.5);
@@ -76,7 +79,11 @@ public class QWERTY {
         retryAttemptsBit = 0;
         retryBit = false;
     }
-
+    
+    public QWERTY(HardwareMap hdwrMap) {
+        this(hdwrMap, 0, 0);
+    }
+    
     public void pushCoord(double xCoord, double yCoord) {
         path.add(new Coord(xCoord,yCoord));
     }
@@ -128,7 +135,7 @@ public class QWERTY {
 
     public boolean iterateLineSeek() {
         final double TOLERANCE = 0.06;
-        double sensorDiff = leftLS.getLightDetected() - rightLS.getLightDetected();
+        double sensorDiff = getLeftLight() - getRightLight();
         if(!seekerBit && Math.abs(sensorDiff) > TOLERANCE) {
             seekerBit = true;
         }
@@ -136,15 +143,15 @@ public class QWERTY {
             seekerBit = false;
             return true;
         }
-        leftMotor.setPower(drivingSpeed);
-        rightMotor.setPower(drivingSpeed);
+        leftMotor.setPower(lineDrivingSpeed);
+        rightMotor.setPower(lineDrivingSpeed);
         trackState();
         return false;
     }
 
     public void iterateLineFollow() {
         final double TOLERANCE = 0.06;
-        double sensorDiff = leftLS.getLightDetected() - rightLS.getLightDetected();
+        double sensorDiff = getLeftLight() - getRightLight();
         if(sensorDiff > TOLERANCE) {
             leftMotor.setPower(-lineDrivingSpeed);
             rightMotor.setPower(lineDrivingSpeed);
@@ -187,7 +194,7 @@ public class QWERTY {
             case "ColorRawRight":
                 return "R - " + rightCS.red() + " G - " + rightCS.green() + " B - " + rightCS.blue();
             case "LightSensors":
-                return "L - " + String.format(Locale.US,"%.2f", leftLS.getLightDetected()) + " R - " + String.format(Locale.US,"%.2f", rightLS.getLightDetected());
+                return "L - " + String.format(Locale.US,"%.2f", getLeftLight()) + " R - " + String.format(Locale.US,"%.2f", getRightLight()) + " Diff: " + String.format(Locale.US,"%.2f", Math.abs(getLeftLight() - getRightLight()));
             default:
                 return "That is not a valid debug parameter.";
         }
@@ -220,7 +227,7 @@ public class QWERTY {
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //Put motor back into driving mode
         buttonServo.setPosition(SERVO_CENTER); //Center the servo for the button pusher
         path = new ArrayList<>(); //Creates a new empty ArrayList object
-        position = new Coord(0,0); //Sets starting position to (0,0)
+        position = origin; //Sets starting position
         heading = 0; //Set starting heading to 0 radians
         seekerBit = false;
         lastEncL = leftMotor.getCurrentPosition(); //Sets original encoder value to current
@@ -256,6 +263,14 @@ public class QWERTY {
     public void toggleLightLeds(boolean onOff) {
         leftLS.enableLed(onOff);
         rightLS.enableLed(onOff);
+    }
+
+    private double getLeftLight() {
+        return leftLS.getLightDetected() - LIGHT_CALIBRATE;
+    }
+
+    private double getRightLight() {
+        return rightLS.getLightDetected() + LIGHT_CALIBRATE;
     }
 
     private void trackState() {

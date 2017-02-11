@@ -15,7 +15,8 @@ if [ ! -d $PWD/ftc_app-master ]
   else echo -n "ftc_app already exists, would you like to redownload it? (y/n): "
        read ui
        if [ $ui = "y" -o $ui = "Y" ]
-         then rm -r $PWD/ftc_app-master
+         then $PWD/sync.sh
+	      rm -r $PWD/ftc_app-master
               pullLink
        fi
 fi
