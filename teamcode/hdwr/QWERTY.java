@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class QWERTY {
-    private final double WHEEL_DIAMETER = 8.5;
+    private final double WHEEL_DIAMETER = 8.6;
     private final double DIFF_DRIVE_RADIUS = 16.5;
     private final double TICKS_PER_ROTATION = 1120.0;
     private final double SERVO_CENTER = 0.5;
@@ -195,6 +195,8 @@ public class QWERTY {
                 return "R - " + rightCS.red() + " G - " + rightCS.green() + " B - " + rightCS.blue();
             case "LightSensors":
                 return "L - " + String.format(Locale.US,"%.2f", getLeftLight()) + " R - " + String.format(Locale.US,"%.2f", getRightLight()) + " Diff: " + String.format(Locale.US,"%.2f", Math.abs(getLeftLight() - getRightLight()));
+	    case "Motors":
+		return "L - " + String.format(Locale.US,"%.2f", leftMotor.getPower()) + " R - " + String.format(Locale.US,"%.2f", rightMotor.getPower());
             default:
                 return "That is not a valid debug parameter.";
         }

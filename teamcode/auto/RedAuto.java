@@ -15,7 +15,7 @@ public class RedAuto extends OpMode {
 
     @Override
     public void init() {
-        this.qwerty = new QWERTY(hardwareMap);
+        this.qwerty = new QWERTY(hardwareMap, 25, -152.5);
         qwerty.setSpeed(0.3);
 	qwerty.toggleLightLeds(true);
         state = 0;
@@ -26,12 +26,13 @@ public class RedAuto extends OpMode {
         telemetry.addData("Position:",qwerty.debug("Position"));
         telemetry.addData("Heading:", qwerty.debug("Heading"));
         telemetry.addData("Color:", qwerty.debug("Color"));
+	telemetry.addData("Motors:", qwerty.debug("Motors"));
         telemetry.addData("Light Sensors:", qwerty.debug("LightSensors"));
         telemetry.addData("Left Color:", qwerty.debug("ColorRawLeft"));
         telemetry.addData("Right Color:", qwerty.debug("ColorRawRight"));
         switch (state) {
             case 0:
-                qwerty.pushCoord(100,75);
+                qwerty.pushCoord(130, -54);
                 state++;
                 break;
             case 1:
@@ -51,7 +52,7 @@ public class RedAuto extends OpMode {
                     state++;
                 break;
             case 5:
-                qwerty.pushCoord(130,50);
+                qwerty.pushCoord(150, -101);
                 state++;
                 break;
             case 6:
@@ -59,7 +60,7 @@ public class RedAuto extends OpMode {
                     state++;
                 break;
             case 7:
-                qwerty.pushCoord(230, 80);
+                qwerty.pushCoord(250, -54);
                 state++;
                 break;
             case 8:
@@ -80,7 +81,7 @@ public class RedAuto extends OpMode {
                     state++;
                 break;
             case 12:
-                qwerty.pushCoord(255, 80);
+                qwerty.pushCoord(265, -60);
                 state++;
                 break;
             case 13:
