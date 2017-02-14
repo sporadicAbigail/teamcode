@@ -193,6 +193,8 @@ public class QWERTY {
                 return "R - " + leftCS.red() + " G - " + leftCS.green() + " B - " + leftCS.blue();
             case "ColorRawRight":
                 return "R - " + rightCS.red() + " G - " + rightCS.green() + " B - " + rightCS.blue();
+            case "ColorRaw":
+                return "RR: " + rightCS.red() + " RB: " + rightCS.blue() + " LR: " + leftCS.red() + " LB: " + leftCS.blue();
             case "LightSensors":
                 return "L - " + String.format(Locale.US,"%.2f", getLeftLight()) + " R - " + String.format(Locale.US,"%.2f", getRightLight()) + " Diff: " + String.format(Locale.US,"%.2f", Math.abs(getLeftLight() - getRightLight()));
 	    case "Motors":
