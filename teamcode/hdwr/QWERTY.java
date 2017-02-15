@@ -86,7 +86,7 @@ public class QWERTY {
         accelL.reset();
         accelR = new ElapsedTime();
         accelR.reset();
-	accelRate = 0.50;
+	accelRate = 0.75;
         retryAttemptsBit = 0;
         retryBit = false;
         resolution = 100;

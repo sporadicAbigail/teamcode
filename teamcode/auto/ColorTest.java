@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.util.Direction;
 import org.firstinspires.ftc.teamcode.util.Stop;
 
 @Autonomous(name = "ColorTest", group = "Autonomous")
-public class BlueTest extends OpMode {
+public class ColorTest extends OpMode {
     private QWERTY qwerty;
 
     @Override
