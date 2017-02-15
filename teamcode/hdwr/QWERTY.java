@@ -18,13 +18,13 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class QWERTY {
-    private final double WHEEL_DIAMETER = 8.6;
-    private final double DIFF_DRIVE_RADIUS = 16.5;
-    private final double TICKS_PER_ROTATION = 1120.0;
-    private final double SERVO_CENTER = 0.5;
-    private final double SERVO_LEFT = 0.0;
-    private final double SERVO_RIGHT = 1.0;
-    private final double LIGHT_CALIBRATE = 0.05;
+    private static final double WHEEL_DIAMETER = 8.6;
+    private static final double DIFF_DRIVE_RADIUS = 16.5;
+    private static final double TICKS_PER_ROTATION = 1120.0;
+    private static final double SERVO_CENTER = 0.5;
+    private static final double SERVO_LEFT = 0.0;
+    private static final double SERVO_RIGHT = 1.0;
+    private static final double LIGHT_CALIBRATE = 0.05;
 
     private TouchSensor frontTS;
 
@@ -56,6 +56,12 @@ public class QWERTY {
     private boolean seekerBit;
     private boolean retryBit;
     private ElapsedTime timer;
+    private ElapsedTime accelL;
+    private ElapsedTime accelR;
+    private double accelRate;
+    private double leftVel;
+    private double rightVel;
+    private int resolution = 100;
 
     public QWERTY(HardwareMap hdwrMap, double startX, double startY) {
         frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
@@ -76,6 +82,11 @@ public class QWERTY {
         retryInterval = 1500;
         timer = new ElapsedTime();
         timer.reset();
+        accelL = new ElapsedTime();
+        accelL.reset();
+        accelR = new ElapsedTime();
+        accelR.reset();
+	accelRate = 0.25;
         retryAttemptsBit = 0;
         retryBit = false;
     }
@@ -197,6 +208,8 @@ public class QWERTY {
                 return "L - " + String.format(Locale.US,"%.2f", getLeftLight()) + " R - " + String.format(Locale.US,"%.2f", getRightLight()) + " Diff: " + String.format(Locale.US,"%.2f", Math.abs(getLeftLight() - getRightLight()));
 	    case "Motors":
 		return "L - " + String.format(Locale.US,"%.2f", leftMotor.getPower()) + " R - " + String.format(Locale.US,"%.2f", rightMotor.getPower());
+	    case "MotorsTarget":
+		return "L - " + String.format(Locale.US,"%.2f", leftVel) + " R - " + String.format(Locale.US,"%.2f", rightVel);
             default:
                 return "That is not a valid debug parameter.";
         }
@@ -234,6 +247,8 @@ public class QWERTY {
         seekerBit = false;
         lastEncL = leftMotor.getCurrentPosition(); //Sets original encoder value to current
         lastEncR = rightMotor.getCurrentPosition(); //Sets original encoder value to current
+	leftVel = 0.0;
+	rightVel = 0.0;
     }
 
     public void setSpeed(double speed) {
@@ -252,14 +267,52 @@ public class QWERTY {
         }
     }
 
-    public void setLeftMotorPower(double power) {
-        trackState();
-        leftMotor.setPower(power);
+    public boolean setLeftMotorPower(double power) {
+	leftVel = power;
+	if(accelL.milliseconds() < resolution)
+	    return false;
+        double delta = accelRate * (accelL.milliseconds() / 1000.0);
+	double current = leftMotor.getPower();
+        double diff = current - leftVel;
+	if(Math.abs(diff) > delta) {
+	    if(diff < 0)
+                leftMotor.setPower(current + delta);
+	    if(diff > 0)
+                leftMotor.setPower(current - delta);
+	    accelL.reset();
+            trackState();
+	    return false;
+	}
+	else {
+            leftMotor.setPower(leftVel);
+            accelL.reset();
+            trackState();
+	    return true;
+	}
     }
 
-    public void setRightMotorPower(double power) {
-        trackState();
-        rightMotor.setPower(power);
+    public boolean setRightMotorPower(double power) {
+	rightVel = power;
+	if(accelR.milliseconds() < resolution)
+	    return false;
+        double delta = accelRate * (accelR.milliseconds() / 1000.0);
+	double current = rightMotor.getPower();
+        double diff = current - rightVel;
+	if(Math.abs(diff) > delta) {
+	    if(diff < 0)
+                rightMotor.setPower(current + delta);
+	    if(diff > 0)
+                rightMotor.setPower(current - delta);
+	    accelR.reset();
+            trackState();
+	    return false;
+	}
+	else {
+            rightMotor.setPower(rightVel);
+            accelR.reset();
+            trackState();
+	    return true;
+	}
     }
 
     public void toggleLightLeds(boolean onOff) {
