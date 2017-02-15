@@ -61,7 +61,7 @@ public class QWERTY {
     private double accelRate;
     private double leftVel;
     private double rightVel;
-    private int resolution = 100;
+    private int resolution;
 
     public QWERTY(HardwareMap hdwrMap, double startX, double startY) {
         frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
@@ -86,9 +86,10 @@ public class QWERTY {
         accelL.reset();
         accelR = new ElapsedTime();
         accelR.reset();
-	accelRate = 0.25;
+	accelRate = 0.50;
         retryAttemptsBit = 0;
         retryBit = false;
+        resolution = 100;
     }
     
     public QWERTY(HardwareMap hdwrMap) {

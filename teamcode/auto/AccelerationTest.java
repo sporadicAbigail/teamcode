@@ -30,7 +30,7 @@ public class AccelerationTest extends OpMode {
             case 0:
 		L = qwerty.setLeftMotorPower(1.0);
 		R = qwerty.setRightMotorPower(1.0);
-	        if(L && R)
+	        if(L || R)
 	            state++;
 		break;
 	    case 1:
@@ -39,11 +39,23 @@ public class AccelerationTest extends OpMode {
 		state++;
 		break;
 	    case 2:
-		L = qwerty.setLeftMotorPower(0.0);
-		R = qwerty.setRightMotorPower(0.0);
-	        if(L && R)
+		L = qwerty.setLeftMotorPower(-1.0);
+		R = qwerty.setRightMotorPower(-1.0);
+	        if(L || R)
 	            state++;
 		break;
+            case 3:
+		L = false;
+		R = false;
+		state++;
+		break;
+	    case 4:
+		L = qwerty.setLeftMotorPower(0.0);
+		R = qwerty.setRightMotorPower(0.0);
+	        if(L || R)
+	            state++;
+		break;
+
             default:
                 qwerty.stop();
                 stop();
