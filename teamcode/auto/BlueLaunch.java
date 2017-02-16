@@ -40,7 +40,7 @@ public class BlueAuto extends OpMode {
                 break;
             case 1:
                RightLaunchMotor.setPower(0.27);
-			   LeftLaunchMotor.setPower(0.27);
+			   LeftLaunchMotor.setPower(-0.27);
 			   if(timer.milliseconds() == 1000){
 				   timer.reset();
 				   state++;
