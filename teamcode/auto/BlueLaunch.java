@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.util.Color;
 import org.firstinspires.ftc.teamcode.util.Direction;
 import org.firstinspires.ftc.teamcode.util.Stop;
 
-@Autonomous(name = "BlueAuto", group = "Autonomous")
-public class BlueAuto extends OpMode {
+@Autonomous(name = "BlueLaunch", group = "Autonomous")
+public class BlueLaunch extends OpMode {
     private QWERTY qwerty;
     private int state;
 	private ElapsedTime timer;
@@ -36,18 +36,17 @@ public class BlueAuto extends OpMode {
         switch (state) {
 			case 0:
                timer.reset();
-			   state ++;
+			   state++;
                 break;
             case 1:
-               RightLaunchMotor.setPower(0.27);
-			   LeftLaunchMotor.setPower(-0.27);
+               qwerty.setLaunchMotors(0.27);
 			   if(timer.milliseconds() == 1000){
 				   timer.reset();
 				   state++;
 			   }
 				break;
             case 2:
-                LaunchServo.setPosition(0.25);
+                qwerty.setLaunchServo(0.25);
 				if(timer.milliseconds() == 1000) {
 					timer.reset();
 					state++;
@@ -57,17 +56,17 @@ public class BlueAuto extends OpMode {
 				if(timer.milliseconds() == 500) {
 					timer.reset();
 					state++;
+				}
 				break;
 			case 4:
-                LaunchServo.setPosition(0.5)
+                qwerty.setLaunchServo(0.5);
 				if(timer.milliseconds() == 1000) {
 					timer.reset();
 					state++;
 				}
                 break;
             case 5:
-                RightLaunchMotor.setPower(0);
-			    LeftLaunchMotor.setPower(0);
+                qwerty.setLaunchMotors(0.0);
 				state++;
                 break;
             default:
