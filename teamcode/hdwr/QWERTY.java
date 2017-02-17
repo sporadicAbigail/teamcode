@@ -67,7 +67,7 @@ public class QWERTY {
     private int resolution;
 
     public QWERTY(HardwareMap hdwrMap, double startX, double startY) {
-       /* frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
+        frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
         leftLS = hdwrMap.lightSensor.get("LS0"); //Set 'leftLS' to the sensor 'LS0' from the HardwareMap
         rightLS = hdwrMap.lightSensor.get("LS1"); //Set 'rightLS' to the sensor 'LS1' from the HardwareMap
         leftLS.enableLed(false); //Turn off LED
@@ -76,10 +76,10 @@ public class QWERTY {
         rightCS = hdwrMap.colorSensor.get("CS1"); //Set 'rightCS' to the sensor 'CS0' from the HardwareMap
         leftMotor = hdwrMap.dcMotor.get("L"); //Set 'leftMotor' to the motor 'L' from the HardwareMap
         rightMotor = hdwrMap.dcMotor.get("R"); //Set 'rightMotor' to the motor 'R' from the HardwareMap
-		*/
+
 		LeftLaunchMotor = hdwrMap.dcMotor.get("LL");  
         RightLaunchMotor = hdwrMap.dcMotor.get("LR"); 
-        //buttonServo = hdwrMap.servo.get("BS"); //Set 'buttonServo' to the sensor 'BS' from the HardwareMap
+        buttonServo = hdwrMap.servo.get("BS"); //Set 'buttonServo' to the sensor 'BS' from the HardwareMap
 		LaunchServo = hdwrMap.servo.get("LS"); 
         origin = new Coord(startX,startY);
         setDirection(Direction.FORWARD);
