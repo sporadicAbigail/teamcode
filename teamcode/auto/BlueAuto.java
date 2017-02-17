@@ -7,11 +7,13 @@ import org.firstinspires.ftc.teamcode.hdwr.QWERTY;
 import org.firstinspires.ftc.teamcode.util.Color;
 import org.firstinspires.ftc.teamcode.util.Direction;
 import org.firstinspires.ftc.teamcode.util.Stop;
+import org.firstinspires.ftc.teamcode.util.ElapsedTime;
 
 @Autonomous(name = "BlueAuto", group = "Autonomous")
 public class BlueAuto extends OpMode {
     private QWERTY qwerty;
     private int state;
+    private ElapsedTime timer;
 
     @Override
     public void init() {
@@ -19,6 +21,7 @@ public class BlueAuto extends OpMode {
         qwerty.setSpeed(0.6,0.2,0.6,1);
 	qwerty.toggleLightLeds(true);
         state = 0;
+	timer = new ElapsedTime();
     }
     @Override
     public void loop() {
@@ -32,6 +35,35 @@ public class BlueAuto extends OpMode {
         telemetry.addData("Left Color:", qwerty.debug("ColorRawLeft"));
         telemetry.addData("Right Color:", qwerty.debug("ColorRawRight"));
         switch (state) {
+            case -5:
+                timer.reset();
+                state++;
+                break;
+            case -4:
+                qwerty.setLaunchMotors(0.28);
+                if(timer.milliseconds() >= 2500) {
+                    timer.reset();
+                    state++;
+                }
+                break;
+            case -3:
+                qwerty.setLaunchServo(0.28);
+                if(timer.milliseconds() >= 500) {
+                    timer.reset();
+                    state++;
+                }
+                break;
+            case -2:
+                qwerty.setLaunchServo(0.5);
+                if(timer.milliseconds() >= 1000) {
+                    timer.reset();
+                    state++;
+                }
+                break;
+            case -1:
+                qwerty.setLaunchMotors(0.0);
+		state++;
+                break;
             case 0:
                 qwerty.pushCoord(125,65);
                 state++;
