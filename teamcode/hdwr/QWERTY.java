@@ -19,7 +19,7 @@ import java.util.Locale;
 
 public class QWERTY {
     private static final double WHEEL_DIAMETER = 8.6;
-    private static final double DIFF_DRIVE_RADIUS = 16.5;
+    private static final double DIFF_DRIVE_RADIUS = 16.3;
     private static final double TICKS_PER_ROTATION = 1120.0;
     private static final double SERVO_CENTER = 0.5;
     private static final double SERVO_LEFT = 0.0;
@@ -62,6 +62,8 @@ public class QWERTY {
     private double leftVel;
     private double rightVel;
     private int resolution;
+    private double accelCurve;
+    private double[] errorAcc;
 
     public QWERTY(HardwareMap hdwrMap, double startX, double startY) {
         frontTS = hdwrMap.touchSensor.get("TS0"); //Set 'frontTS' to the sensor 'TS0' from the HardwareMap
@@ -86,10 +88,10 @@ public class QWERTY {
         accelL.reset();
         accelR = new ElapsedTime();
         accelR.reset();
-	accelRate = 0.75;
         retryAttemptsBit = 0;
         retryBit = false;
         resolution = 100;
+	errorAcc = new double[5];
     }
     
     public QWERTY(HardwareMap hdwrMap) {
@@ -155,8 +157,8 @@ public class QWERTY {
             seekerBit = false;
             return true;
         }
-        leftMotor.setPower(lineDrivingSpeed);
-        rightMotor.setPower(lineDrivingSpeed);
+        setLeftMotorPower(lineDrivingSpeed);
+        setRightMotorPower(lineDrivingSpeed);
         trackState();
         return false;
     }
@@ -254,11 +256,20 @@ public class QWERTY {
 	rightVel = 0.0;
     }
 
-    public void setSpeed(double speed) {
-        drivingSpeed = speed;
-        lineDrivingSpeed = speed / 2.0;
+    public void setSpeed(double mainSpeed, double lineSpeed, double rate, double curve) {
+        drivingSpeed = mainSpeed;
+        lineDrivingSpeed = lineSpeed;
+	accelRate = rate;
+	accelCurve = curve;
     }
-
+    
+    public void setSpeed(double mainSpeed, double lineSpeed) {
+        setSpeed(mainSpeed, lineSpeed, 0.75, 1);
+    }
+    public void setSpeed(double speed) {
+        setSpeed(speed, speed / 2.0, 0.75, 1);
+    }
+    
     public void setStopBehavior(Stop type) {
         if(type == Stop.BRAKE) {
             leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -271,10 +282,12 @@ public class QWERTY {
     }
 
     public boolean setLeftMotorPower(double power) {
-	leftVel = power;
+	if(power > drivingSpeed) leftVel = drivingSpeed;
+	else if(power < -drivingSpeed) leftVel = -drivingSpeed;
+	else leftVel = power;
 	if(accelL.milliseconds() < resolution)
 	    return false;
-        double delta = accelRate * (accelL.milliseconds() / 1000.0);
+        double delta = accelRate * Math.pow(resolution / 1000.0, accelCurve);
 	double current = leftMotor.getPower();
         double diff = current - leftVel;
 	if(Math.abs(diff) > delta) {
@@ -295,10 +308,12 @@ public class QWERTY {
     }
 
     public boolean setRightMotorPower(double power) {
-	rightVel = power;
+        if(power > drivingSpeed) rightVel = drivingSpeed;
+	else if(power < -drivingSpeed) rightVel = -drivingSpeed;
+	else rightVel = power;
 	if(accelR.milliseconds() < resolution)
 	    return false;
-        double delta = accelRate * (accelR.milliseconds() / 1000.0);
+        double delta = accelRate * Math.pow(accelR.milliseconds() / 1000.0, accelCurve);
 	double current = rightMotor.getPower();
         double diff = current - rightVel;
 	if(Math.abs(diff) > delta) {
@@ -329,6 +344,17 @@ public class QWERTY {
 
     private double getRightLight() {
         return rightLS.getLightDetected() + LIGHT_CALIBRATE;
+    }
+
+    private double intError(double next) {
+        for(int i = errorAcc.length - 1; i > 0; i--) {
+	    errorAcc[i] = errorAcc[i-1];
+	}
+	errorAcc[0] = next;
+	double sum = 0.0;
+	for(double val : errorAcc)
+	    sum += val;
+	return sum;
     }
 
     private void trackState() {
@@ -389,33 +415,40 @@ public class QWERTY {
 
     //Navigate to target point and return true if target has been reached
     private boolean moveTo(Coord coord, Direction dir) {
-        final double TOLERANCE = 2;
+        final double TOLERANCE = 5;
 
         //Define PID controller ratios
         final double P = 0.5;
+	final double I = 0.03;
 
         //If the robot is farther than 2cm away from the target position, drive to target.
         if (position.distanceTo(coord) > TOLERANCE) {
             double hError;
+	    double accHError;
+	    double in;
             double lPower;
             double rPower;
             if (dir == Direction.FORWARD) {
                 //Calculate heading error and motor velocities
                 hError = headingError(heading, position.headingTo(coord));
-                lPower = drivingSpeed - (hError * P);
-                rPower = drivingSpeed + (hError * P);
+		accHError = intError(hError);
+		in = hError * P + accHError * I;
+                lPower = drivingSpeed - in;
+                rPower = drivingSpeed + in;
             }
             else {
                 //Calculate heading error and motor velocities
                 double dirtyHeading = heading + Math.PI;
                 double reverseHeading =  (dirtyHeading > 0 ? dirtyHeading : dirtyHeading + 2 * Math.PI) % (2 * Math.PI);
                 hError = headingError(reverseHeading, position.headingTo(coord));
-                lPower = - drivingSpeed - (hError * P);
-                rPower = - drivingSpeed + (hError * P);
+		accHError = intError(hError);
+		in = hError * P + accHError * I;
+                lPower = - drivingSpeed - in;
+                rPower = - drivingSpeed + in;
             }
             //Set motor velocities
-            leftMotor.setPower(lPower);
-            rightMotor.setPower(rPower);
+            setLeftMotorPower(lPower);
+            setRightMotorPower(rPower);
 
             //Update robot state based on change in encoder position
             trackState();

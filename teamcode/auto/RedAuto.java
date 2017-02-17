@@ -38,6 +38,7 @@ public class RedAuto extends OpMode {
             case 1:
                 if(qwerty.iterateGTG(Direction.FORWARD))
                     state++;
+		break;
             case 2:
                 if (qwerty.iterateLineSeek())
                     state++;
@@ -88,15 +89,6 @@ public class RedAuto extends OpMode {
                 if(qwerty.iterateGTG(Direction.REVERSE))
                     state++;
                 break;
-            /*case 14:
-                qwerty.pushCoord(155, -25);
-                state++;
-                break;
-            case 15:
-                if(qwerty.iterateGTG(Direction.FORWARD))
-                    state++;
-                break;
-            */
             default:
                 qwerty.stop();
                 stop();

@@ -15,8 +15,8 @@ public class BlueAuto extends OpMode {
 
     @Override
     public void init() {
-        this.qwerty = new QWERTY(hardwareMap, 25, 152.5);
-        qwerty.setSpeed(0.3);
+        this.qwerty = new QWERTY(hardwareMap, 22, 152.5);
+        qwerty.setSpeed(0.6,0.2,0.6,1);
 	qwerty.toggleLightLeds(true);
         state = 0;
     }
@@ -26,18 +26,20 @@ public class BlueAuto extends OpMode {
         telemetry.addData("Position:",qwerty.debug("Position"));
         telemetry.addData("Heading:", qwerty.debug("Heading"));
 	telemetry.addData("Motors:", qwerty.debug("Motors"));
+	telemetry.addData("Motors Target:", qwerty.debug("MotorsTarget"));
         telemetry.addData("Color:", qwerty.debug("Color"));
         telemetry.addData("Light Sensors:", qwerty.debug("LightSensors"));
         telemetry.addData("Left Color:", qwerty.debug("ColorRawLeft"));
         telemetry.addData("Right Color:", qwerty.debug("ColorRawRight"));
         switch (state) {
             case 0:
-                qwerty.pushCoord(130,54);
+                qwerty.pushCoord(125,65);
                 state++;
                 break;
             case 1:
                 if(qwerty.iterateGTG(Direction.FORWARD))
                     state++;
+		break;
             case 2:
                 if (qwerty.iterateLineSeek())
                     state++;
@@ -60,7 +62,7 @@ public class BlueAuto extends OpMode {
                     state++;
                 break;
             case 7:
-                qwerty.pushCoord(250, 54);
+                qwerty.pushCoord(245, 65);
                 state++;
                 break;
             case 8:
@@ -88,15 +90,6 @@ public class BlueAuto extends OpMode {
                 if(qwerty.iterateGTG(Direction.REVERSE))
                     state++;
                 break;
-            /*case 14:
-                qwerty.pushCoord(155, 25);
-                state++;
-                break;
-            case 15:
-                if(qwerty.iterateGTG(Direction.FORWARD))
-                    state++;
-                break;
-            */
             default:
                 qwerty.stop();
                 stop();

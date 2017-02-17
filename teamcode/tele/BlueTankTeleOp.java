@@ -20,7 +20,9 @@ public class BlueTankTeleOp extends OpMode
     @Override
     public void init() {
         this.qwerty = new QWERTY(hardwareMap);
-        qwerty.setSpeed(0.4);
+	qwerty.setStopBehavior(Stop.BRAKE);
+	qwerty.toggleLightLeds(true);
+        qwerty.setSpeed(0.50, 0.2);
         state = 0;
         aJP = false;
     }
@@ -32,11 +34,13 @@ public class BlueTankTeleOp extends OpMode
 	telemetry.addData("Motors Target:", qwerty.debug("MotorsTarget"));
         switch (state) {
             case 0:
-                double leftVel = -gamepad1.left_stick_y / 2;
-                double rightVel = -gamepad1.right_stick_y / 2;
+                double leftVel = -gamepad1.left_stick_y;
+                double rightVel = -gamepad1.right_stick_y;
 
                 qwerty.setLeftMotorPower(leftVel);
                 qwerty.setRightMotorPower(rightVel);
+
+                if (gamepad1.right_bumper) qwerty.stop();
 
                 if (gamepad1.a && !aJP) {
                     qwerty.centerServo();
