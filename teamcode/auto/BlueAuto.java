@@ -2,12 +2,12 @@ package org.firstinspires.ftc.teamcode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hdwr.QWERTY;
 import org.firstinspires.ftc.teamcode.util.Color;
 import org.firstinspires.ftc.teamcode.util.Direction;
 import org.firstinspires.ftc.teamcode.util.Stop;
-import org.firstinspires.ftc.teamcode.util.ElapsedTime;
 
 @Autonomous(name = "BlueAuto", group = "Autonomous")
 public class BlueAuto extends OpMode {
