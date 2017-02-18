@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.tele;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.teamcode.util.Direction;
 import org.firstinspires.ftc.teamcode.util.Stop;
 
 @TeleOp(name="RedTeleOp", group="TeleOp")
+@Disabled
 public class RedTeleOp extends OpMode
 {
     private QWERTY qwerty;
