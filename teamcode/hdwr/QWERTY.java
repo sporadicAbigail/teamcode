@@ -36,11 +36,8 @@ public class QWERTY {
 
     private DcMotor leftMotor;
     private DcMotor rightMotor;
-    private DcMotor leftLaunchMotor;
-    private DcMotor rightLaunchMotor;
 
     private Servo buttonServo;
-    private Servo launchServo;
 
     private int lastEncL;
     private int lastEncR;
@@ -78,10 +75,7 @@ public class QWERTY {
         rightCS = hdwrMap.colorSensor.get("CS1"); //Set 'rightCS' to the sensor 'CS0' from the HardwareMap
         leftMotor = hdwrMap.dcMotor.get("L"); //Set 'leftMotor' to the motor 'L' from the HardwareMap
         rightMotor = hdwrMap.dcMotor.get("R"); //Set 'rightMotor' to the motor 'R' from the HardwareMap
-        leftLaunchMotor = hdwrMap.dcMotor.get("LL"); // Launch Left Motor
-        rightLaunchMotor = hdwrMap.dcMotor.get("LR"); // Launch Right Motor
         buttonServo = hdwrMap.servo.get("BS"); //Set 'buttonServo' to the sensor 'BS' from the HardwareMap
-        buttonServo = hdwrMap.servo.get("LS"); // Launch Servo
         origin = new Coord(startX,startY);
         setDirection(Direction.FORWARD);
         resetState();
@@ -465,14 +459,4 @@ public class QWERTY {
             return true;
         }
     }
-
-    public void setLaunchMotors(double speed) {
-        rightLaunchMotor.setPower(-speed);
-        leftLaunchMotor.setPower(speed);
-    }
-
-    public void setLaunchServo(double position) {
-        launchServo.setPosition(position);
-    }
-
 }
