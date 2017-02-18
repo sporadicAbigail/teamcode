@@ -50,7 +50,7 @@ public class BlueAuto extends OpMode {
                     state++;
                 break;
             case 4:
-                if(qwerty.iteratePushButton(Color.BLUE))
+                if(qwerty.iteratePushButton(Color.RED))
                     state++;
                 break;
             case 5:
@@ -79,7 +79,7 @@ public class BlueAuto extends OpMode {
                     state++;
                 break;
             case 11:
-                if(qwerty.iteratePushButton(Color.BLUE))
+                if(qwerty.iteratePushButton(Color.RED))
                     state++;
                 break;
             case 12:
