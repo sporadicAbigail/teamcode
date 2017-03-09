@@ -91,7 +91,7 @@ public class QWERTY {
         retryAttemptsBit = 0;
         retryBit = false;
         resolution = 100;
-	errorAcc = new double[5];
+	errorAcc = new double[1000];
     }
     
     public QWERTY(HardwareMap hdwrMap) {
@@ -148,7 +148,7 @@ public class QWERTY {
     }
 
     public boolean iterateLineSeek() {
-        final double TOLERANCE = 0.06;
+        final double TOLERANCE = 0.0575;
         double sensorDiff = getLeftLight() - getRightLight();
         if(!seekerBit && Math.abs(sensorDiff) > TOLERANCE) {
             seekerBit = true;
@@ -164,7 +164,7 @@ public class QWERTY {
     }
 
     public void iterateLineFollow() {
-        final double TOLERANCE = 0.06;
+        final double TOLERANCE = 0.0575;
         double sensorDiff = getLeftLight() - getRightLight();
         if(sensorDiff > TOLERANCE) {
             leftMotor.setPower(-lineDrivingSpeed);
@@ -185,6 +185,7 @@ public class QWERTY {
         if (!path.isEmpty()) {
             if (moveTo(path.get(0), dir)) {
                 path.remove(0);
+		errorAcc = new double[1000];
             }
             return false;
         }
@@ -415,11 +416,11 @@ public class QWERTY {
 
     //Navigate to target point and return true if target has been reached
     private boolean moveTo(Coord coord, Direction dir) {
-        final double TOLERANCE = 5;
+        final double TOLERANCE = 6.5;
 
         //Define PID controller ratios
-        final double P = 0.5;
-	final double I = 0.03;
+        final double P = 0.6;
+	final double I = 0.0000;
 
         //If the robot is farther than 2cm away from the target position, drive to target.
         if (position.distanceTo(coord) > TOLERANCE) {

@@ -16,7 +16,7 @@ public class RedAuto extends OpMode {
     @Override
     public void init() {
         this.qwerty = new QWERTY(hardwareMap, 22, -152.5);
-        qwerty.setSpeed(0.6,0.2,0.6,1);
+        qwerty.setSpeed(0.4,0.2,2,1);
 	qwerty.toggleLightLeds(true);
         state = 0;
     }
@@ -33,7 +33,7 @@ public class RedAuto extends OpMode {
         telemetry.addData("Right Color:", qwerty.debug("ColorRawRight"));
         switch (state) {
             case 0:
-                qwerty.pushCoord(120,-60);
+                qwerty.pushCoord(120,-65);
                 state++;
                 break;
             case 1:
@@ -54,7 +54,7 @@ public class RedAuto extends OpMode {
                     state++;
                 break;
             case 5:
-                qwerty.pushCoord(175,-101);
+                qwerty.pushCoord(160,-95);
                 state++;
                 break;
             case 6:
@@ -62,7 +62,7 @@ public class RedAuto extends OpMode {
                     state++;
                 break;
             case 7:
-                qwerty.pushCoord(240, -65);
+                qwerty.pushCoord(235, -50);
                 state++;
                 break;
             case 8:
@@ -83,7 +83,7 @@ public class RedAuto extends OpMode {
                     state++;
                 break;
             case 12:
-                qwerty.pushCoord(265, -60);
+                qwerty.pushCoord(250, -60);
                 state++;
                 break;
             case 13:

@@ -22,7 +22,7 @@ public class RedTankTeleOp extends OpMode
         this.qwerty = new QWERTY(hardwareMap);
 	qwerty.setStopBehavior(Stop.BRAKE);
 	qwerty.toggleLightLeds(true);
-        qwerty.setSpeed(0.50, 0.2);
+        qwerty.setSpeed(0.50, 0.2, 1.25, 1);
         state = 0;
         aJP = false;
     }
