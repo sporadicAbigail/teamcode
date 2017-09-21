@@ -6,15 +6,18 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous
+@TeleOp
 public class AVCGoToGoal extends OpMode {
     private DcMotor rightMotor;
     private DcMotor leftMotor;
     private static final double ROTATION_TICKS = 560;
     private static final double WHEEL_DIAMETER = 12.5;
+    private static final double WHEEL_BASE = 30;
     private double heading;
     private double coordX;
     private double coordY;
+    private int lastEncLeft;
+    private int lastEncRight;
 
     @Override
     public void init() {
@@ -29,6 +32,8 @@ public class AVCGoToGoal extends OpMode {
         heading = 0;
         coordX = 0;
         coordY = 0;
+        lastEncLeft = leftMotor.getCurrentPosition();
+        lastEncRight = rightMotor.getCurrentPosition();
     }
 
     /*
@@ -43,8 +48,7 @@ public class AVCGoToGoal extends OpMode {
      */
     @Override
     public void start() {
-        leftMotor.setPower(1);
-        rightMotor.setPower(1);
+        
     }
 
     /*
@@ -56,6 +60,15 @@ public class AVCGoToGoal extends OpMode {
         int encoderRight = rightMotor.getCurrentPosition();
         telemetry.addData("Left Encoder", encoderLeft);
         telemetry.addData("Right Encoder", encoderRight);
+        
+        leftMotor.setPower(-gamepad1.left_stick_y / 2.5);
+        rightMotor.setPower(-gamepad1.right_stick_y / 2.5);
+        
+        updateState(encoderLeft - lastEncLeft, encoderRight - lastEncRight);
+        telemetry.addData("Heading", heading);
+        
+        lastEncLeft = encoderLeft;
+        lastEncRight = encoderRight;
     }
 
     /*
@@ -69,6 +82,11 @@ public class AVCGoToGoal extends OpMode {
     private void updateState(int encoderDeltaLeft, int encoderDeltaRight){
         double encoderAverage = (encoderDeltaLeft + encoderDeltaRight) / 2;
         double encoderDiff = encoderDeltaRight - encoderDeltaLeft;
-        double rots = encoderDiff / (2 * ROTATION_TICKS);
+        double turnDist = (encoderDiff / (2 * ROTATION_TICKS)) * Math.PI * WHEEL_DIAMETER;
+        double deltaHeading = (turnDist * 2 * Math.PI) / (WHEEL_BASE * Math.PI);
+        heading += deltaHeading;
+        double dist = (encoderAverage * WHEEL_DIAMETER * Math.PI) / ROTATION_TICKS;
+        coordX = dist * Math.cos(heading);
+        coordY = dist * Math.sin(heading);
     }
 }
