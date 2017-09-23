@@ -6,18 +6,23 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@TeleOp
+@Autonomous
 public class AVCGoToGoal extends OpMode {
     private DcMotor rightMotor;
     private DcMotor leftMotor;
     private static final double ROTATION_TICKS = 560;
     private static final double WHEEL_DIAMETER = 12.5;
     private static final double WHEEL_BASE = 30;
+    private static final double TURN_ERROR = 0.05;
     private double heading;
+    private double dist;
     private double coordX;
     private double coordY;
     private int lastEncLeft;
     private int lastEncRight;
+    private double targetHeading = Math.PI;
+    private double targetDistance = 100;
+    private int state;
 
     @Override
     public void init() {
@@ -30,10 +35,13 @@ public class AVCGoToGoal extends OpMode {
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         heading = 0;
+        dist = 0;
         coordX = 0;
         coordY = 0;
         lastEncLeft = leftMotor.getCurrentPosition();
         lastEncRight = rightMotor.getCurrentPosition();
+        
+        state = 0;
     }
 
     /*
@@ -60,12 +68,51 @@ public class AVCGoToGoal extends OpMode {
         int encoderRight = rightMotor.getCurrentPosition();
         telemetry.addData("Left Encoder", encoderLeft);
         telemetry.addData("Right Encoder", encoderRight);
+        telemetry.addData("State", state);
         
-        leftMotor.setPower(-gamepad1.left_stick_y / 2.5);
-        rightMotor.setPower(-gamepad1.right_stick_y / 2.5);
+        //leftMotor.setPower(-gamepad1.left_stick_y / 2.5);
+        //rightMotor.setPower(-gamepad1.right_stick_y / 2.5);
+        
+        double headingError = targetHeading - heading;
+        
+        switch (state) {
+            case 0:
+                state = 1;
+                break; 
+            case 1:
+                if (Math.abs(headingError) < TURN_ERROR) {
+                    state = 2;
+                    break;
+                }
+                else {
+                    double PSpeed = Math.abs(headingError / Math.PI);
+                    
+                    if (targetHeading > heading) {
+                        rightMotor.setPower(PSpeed);
+                        leftMotor.setPower(-PSpeed);
+                    }
+                    else {
+                        rightMotor.setPower(-PSpeed);
+                        leftMotor.setPower(PSpeed);
+                    }    
+                }
+                break;
+            case 2:
+                //if (distance > targetDistance) {
+                    rightMotor.setPower(0);
+                    leftMotor.setPower(0);
+                // }
+                //else {
+                  //  rightMotor.setPower(0.5);
+                    //leftMotor.setPower(0.5);
+               // }
+                break;
+        }
         
         updateState(encoderLeft - lastEncLeft, encoderRight - lastEncRight);
         telemetry.addData("Heading", heading);
+        telemetry.addData("x coordinate", coordX);
+        telemetry.addData("y coordinate", coordY);
         
         lastEncLeft = encoderLeft;
         lastEncRight = encoderRight;
@@ -85,8 +132,10 @@ public class AVCGoToGoal extends OpMode {
         double turnDist = (encoderDiff / (2 * ROTATION_TICKS)) * Math.PI * WHEEL_DIAMETER;
         double deltaHeading = (turnDist * 2 * Math.PI) / (WHEEL_BASE * Math.PI);
         heading += deltaHeading;
-        double dist = (encoderAverage * WHEEL_DIAMETER * Math.PI) / ROTATION_TICKS;
+        dist += (encoderAverage * WHEEL_DIAMETER * Math.PI) / ROTATION_TICKS;
         coordX = dist * Math.cos(heading);
         coordY = dist * Math.sin(heading);
+        
+        telemetry.addData("distance", dist);
     }
 }
