@@ -15,14 +15,14 @@ public class AVCGoToGoal extends OpMode {
     private static final double WHEEL_BASE = 30;
     private static final double TURN_ERROR = 0.05;
     private double heading;
-    private double dist;
     private double coordX;
     private double coordY;
     private int lastEncLeft;
     private int lastEncRight;
-    private double targetHeading = Math.PI;
-    private double targetDistance = 100;
+    private double targetCoordX = 100;
+    private double targetCoordY = 100;
     private int state;
+
 
     @Override
     public void init() {
@@ -35,13 +35,12 @@ public class AVCGoToGoal extends OpMode {
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         heading = 0;
-        dist = 0;
         coordX = 0;
         coordY = 0;
         lastEncLeft = leftMotor.getCurrentPosition();
         lastEncRight = rightMotor.getCurrentPosition();
         
-        state = 0;
+        state = 1;
     }
 
     /*
@@ -68,19 +67,13 @@ public class AVCGoToGoal extends OpMode {
         int encoderRight = rightMotor.getCurrentPosition();
         telemetry.addData("Left Encoder", encoderLeft);
         telemetry.addData("Right Encoder", encoderRight);
-        telemetry.addData("State", state);
-        
-        //leftMotor.setPower(-gamepad1.left_stick_y / 2.5);
-        //rightMotor.setPower(-gamepad1.right_stick_y / 2.5);
         
         double headingError = targetHeading - heading;
         
         switch (state) {
-            case 0:
-                state = 1;
-                break; 
             case 1:
-                if (Math.abs(headingError) < TURN_ERROR) {
+                // Replace this with the GTG loop
+                /*if (Math.abs(headingError) < TURN_ERROR) {
                     state = 2;
                     break;
                 }
@@ -95,24 +88,17 @@ public class AVCGoToGoal extends OpMode {
                         rightMotor.setPower(-PSpeed);
                         leftMotor.setPower(PSpeed);
                     }    
-                }
+                }*/
                 break;
             case 2:
-                //if (distance > targetDistance) {
-                    rightMotor.setPower(0);
-                    leftMotor.setPower(0);
-                // }
-                //else {
-                  //  rightMotor.setPower(0.5);
-                    //leftMotor.setPower(0.5);
-               // }
+                // Stop the robot here
                 break;
         }
         
         updateState(encoderLeft - lastEncLeft, encoderRight - lastEncRight);
         telemetry.addData("Heading", heading);
-        telemetry.addData("x coordinate", coordX);
-        telemetry.addData("y coordinate", coordY);
+        telemetry.addData("x Coordinate", coordX);
+        telemetry.addData("y Coordinate", coordY);
         
         lastEncLeft = encoderLeft;
         lastEncRight = encoderRight;
@@ -131,11 +117,9 @@ public class AVCGoToGoal extends OpMode {
         double encoderDiff = encoderDeltaRight - encoderDeltaLeft;
         double turnDist = (encoderDiff / (2 * ROTATION_TICKS)) * Math.PI * WHEEL_DIAMETER;
         double deltaHeading = (turnDist * 2 * Math.PI) / (WHEEL_BASE * Math.PI);
-        heading += deltaHeading;
-        dist += (encoderAverage * WHEEL_DIAMETER * Math.PI) / ROTATION_TICKS;
-        coordX = dist * Math.cos(heading);
-        coordY = dist * Math.sin(heading);
-        
-        telemetry.addData("distance", dist);
+        heading += deltaHeading; // Bound this with mod 2PI
+        double dist = (encoderAverage * WHEEL_DIAMETER * Math.PI) / ROTATION_TICKS;
+        coordX += dist * Math.cos(heading);
+        coordY += dist * Math.sin(heading);
     }
 }
