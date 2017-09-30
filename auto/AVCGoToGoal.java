@@ -1,19 +1,25 @@
 package AVC;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import java.util.Collections;
+import java.util.ArrayList;
 
 @Autonomous
 public class AVCGoToGoal extends OpMode {
+    private static final int SENSOR_VALUES_SIZE = 10;
+    private AnalogInput rUS;
+    private AnalogInput lUS;
     private DcMotor rightMotor;
     private DcMotor leftMotor;
     private static final double ROTATION_TICKS = 560;
     private static final double WHEEL_DIAMETER = 12.5;
     private static final double WHEEL_BASE = 30;
-    private static final double GTG_TOLERANCE = 5; //tune this
+    private static final double GTG_TOLERANCE = 5;
     private static final double P_DIST = 0.0075;
     private static final double P_HEAD = 0.09;
     private double heading;
@@ -23,6 +29,9 @@ public class AVCGoToGoal extends OpMode {
     private int lastEncRight;
     private double speed;    
     private int state;
+    
+    private ArrayList<Integer> rSensorValues;
+    private ArrayList<Integer> lSensorValues;
     
     @Override
     public void init() {
@@ -34,6 +43,8 @@ public class AVCGoToGoal extends OpMode {
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rSensorValues = new ArrayList<>();
+        lSensorValues = new ArrayList<>();
         heading = 0;
         coordX = 0;
         coordY = 0;
@@ -43,24 +54,15 @@ public class AVCGoToGoal extends OpMode {
         state = 1;
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
     @Override
     public void init_loop() {
     }
 
-    /*
-     * Code to run ONCE when the driver hits PLAY
-     */
     @Override
     public void start() {
         
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
     @Override
     public void loop() {
         int encoderLeft = leftMotor.getCurrentPosition();
@@ -70,14 +72,12 @@ public class AVCGoToGoal extends OpMode {
         
         switch (state) {
             case 1:
-                // Replace this with the GTG loop
                 if (goToGoal(100, 100) < GTG_TOLERANCE) {
                     state = 2;
                     break;
                 }
                 break;
             case 2:
-                // Stop the robot here
                 leftMotor.setPower(0);
                 rightMotor.setPower(0);
                 break;
@@ -92,9 +92,6 @@ public class AVCGoToGoal extends OpMode {
         lastEncRight = encoderRight;
     }
 
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
     @Override
     public void stop() {
 
@@ -130,6 +127,29 @@ public class AVCGoToGoal extends OpMode {
         telemetry.addData("Heading error", headingError);
         telemetry.addData("Delta Dist", deltaDist);
         return deltaDist;
+    }
+    
+    private void readSensors() {
+        double rUSVoltage = rUS.getVoltage();
+        double lUSVoltage = lUS.getVoltage();
+        int rUSDist = (int) Math.round(rUSVoltage / (3.3 / 1024) * 2.54);
+        int lUSDist = (int) Math.round(lUSVoltage / (3.3 / 1024) * 2.54);
+        
+        if(rSensorValues.size() > SENSOR_VALUES_SIZE) {
+            rSensorValues.remove(0);
+        }
+        if(lSensorValues.size() > SENSOR_VALUES_SIZE) {
+            lSensorValues.remove(0);
+        }
+        
+        rSensorValues.add(rUSDist);
+        lSensorValues.add(lUSDist);
+    }
+    
+    public int getSensor(ArrayList<Integer> list){
+        ArrayList<Integer> newList = new ArrayList<Integer>(list);
+        Collections.sort(newList);
+        return newList.get(SENSOR_VALUES_SIZE / 2);
     }
 }
 
