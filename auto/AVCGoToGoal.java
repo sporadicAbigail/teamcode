@@ -20,8 +20,8 @@ public class AVCGoToGoal extends OpMode {
     private static final double WHEEL_DIAMETER = 12.5;
     private static final double WHEEL_BASE = 30;
     private static final double GTG_TOLERANCE = 5;
-    private static final double P_DIST = 0.0075;
-    private static final double P_HEAD = 0.09;
+    private static final double P_DIST = 1.0;
+    private static final double P_HEAD = 0.175;
     private double heading;
     private double coordX;
     private double coordY;
@@ -30,6 +30,7 @@ public class AVCGoToGoal extends OpMode {
     private double speed;    
     private int state;
     
+    private ArrayList<Double[]> points;
     private ArrayList<Integer> rSensorValues;
     private ArrayList<Integer> lSensorValues;
     
@@ -43,6 +44,13 @@ public class AVCGoToGoal extends OpMode {
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        points = new ArrayList<>();
+        addPoint(855, 0);
+        addPoint(855, -945);
+        addPoint(0, -1645);
+        addPoint(-855, -945);
+        addPoint(-855, 0);
+        addPoint(0, 0);
         rSensorValues = new ArrayList<>();
         lSensorValues = new ArrayList<>();
         heading = 0;
@@ -50,7 +58,7 @@ public class AVCGoToGoal extends OpMode {
         coordY = 0;
         lastEncLeft = leftMotor.getCurrentPosition();
         lastEncRight = rightMotor.getCurrentPosition();
-        speed = 0.3;
+        speed = 0.40;
         state = 1;
     }
 
@@ -72,9 +80,11 @@ public class AVCGoToGoal extends OpMode {
         
         switch (state) {
             case 1:
-                if (goToGoal(100, 100) < GTG_TOLERANCE) {
-                    state = 2;
-                    break;
+                if (goToGoal(points.get(0)) < GTG_TOLERANCE) {
+                    points.remove(0);
+                }
+                if (points.size() < 1) {
+                    state = 2; 
                 }
                 break;
             case 2:
@@ -108,7 +118,10 @@ public class AVCGoToGoal extends OpMode {
         coordY += dist * Math.sin(heading);
     }
     
-    private double goToGoal(double targetX, double targetY) {
+    private double goToGoal(Double[] point) {
+        double targetX = point[0];
+        double targetY = point[1];
+        
         double deltaX = targetX - coordX;
         double deltaY = targetY - coordY;
         
@@ -146,10 +159,16 @@ public class AVCGoToGoal extends OpMode {
         lSensorValues.add(lUSDist);
     }
     
-    public int getSensor(ArrayList<Integer> list){
+    private int getSensor(ArrayList<Integer> list) {
         ArrayList<Integer> newList = new ArrayList<Integer>(list);
         Collections.sort(newList);
         return newList.get(SENSOR_VALUES_SIZE / 2);
     }
+    
+    private void addPoint(double x, double y) {
+        Double[] point = {x, y}; 
+        points.add(point);
+    }
 }
+
 
