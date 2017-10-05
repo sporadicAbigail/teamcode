@@ -11,17 +11,19 @@ import java.util.ArrayList;
 
 @Autonomous
 public class AVCGoToGoal extends OpMode {
-    private static final int SENSOR_VALUES_SIZE = 10;
     private AnalogInput rUS;
     private AnalogInput lUS;
     private DcMotor rightMotor;
     private DcMotor leftMotor;
+    private static final int SENSOR_VALUES_SIZE = 20;
     private static final double ROTATION_TICKS = 560;
     private static final double WHEEL_DIAMETER = 12.5;
-    private static final double WHEEL_BASE = 30;
+    private static final double WHEEL_BASE = 29.25;
     private static final double GTG_TOLERANCE = 5;
     private static final double P_DIST = 1.0;
     private static final double P_HEAD = 0.175;
+    private static final double P_SENSOR = 0.0025;
+    private static final double SENSOR_CURVE = 0.5;
     private double heading;
     private double coordX;
     private double coordY;
@@ -37,6 +39,8 @@ public class AVCGoToGoal extends OpMode {
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
+        rUS = (AnalogInput) hardwareMap.get("RUS");
+        lUS = (AnalogInput) hardwareMap.get("LUS");
         rightMotor = (DcMotor) hardwareMap.get("rightMotor");
         leftMotor = (DcMotor) hardwareMap.get("leftMotor");
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -45,12 +49,18 @@ public class AVCGoToGoal extends OpMode {
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         points = new ArrayList<>();
-        addPoint(855, 0);
+        /*addPoint(855, 0);
         addPoint(855, -945);
         addPoint(0, -1645);
         addPoint(-855, -945);
         addPoint(-855, 0);
-        addPoint(0, 0);
+        addPoint(0, 0);*/
+        /*addPoint(243, 0);
+        addPoint(243, -457);
+        addPoint(-243, -457);
+        addPoint(-243, 0);
+        addPoint(0, 0);*/
+        addPoint(500, 0);
         rSensorValues = new ArrayList<>();
         lSensorValues = new ArrayList<>();
         heading = 0;
@@ -58,12 +68,13 @@ public class AVCGoToGoal extends OpMode {
         coordY = 0;
         lastEncLeft = leftMotor.getCurrentPosition();
         lastEncRight = rightMotor.getCurrentPosition();
-        speed = 0.40;
+        speed = 0.30;
         state = 1;
     }
 
     @Override
     public void init_loop() {
+        readSensors();
     }
 
     @Override
@@ -75,8 +86,9 @@ public class AVCGoToGoal extends OpMode {
     public void loop() {
         int encoderLeft = leftMotor.getCurrentPosition();
         int encoderRight = rightMotor.getCurrentPosition();
-        telemetry.addData("Left Encoder", encoderLeft);
-        telemetry.addData("Right Encoder", encoderRight);
+        
+        updateState(encoderLeft - lastEncLeft, encoderRight - lastEncRight);
+        readSensors();
         
         switch (state) {
             case 1:
@@ -93,10 +105,11 @@ public class AVCGoToGoal extends OpMode {
                 break;
         }
         
-        updateState(encoderLeft - lastEncLeft, encoderRight - lastEncRight);
         telemetry.addData("Heading", heading);
         telemetry.addData("x Coordinate", coordX);
         telemetry.addData("y Coordinate", coordY);
+        telemetry.addData("Left Sensor", getSensor(lSensorValues));
+        telemetry.addData("Right Sensor", getSensor(rSensorValues));
         
         lastEncLeft = encoderLeft;
         lastEncRight = encoderRight;
@@ -130,10 +143,13 @@ public class AVCGoToGoal extends OpMode {
         double headingError = targetHeading - heading;
         headingError = (headingError > Math.PI) ? headingError - 2 * Math.PI : headingError;
         
+        int sensorDiff = getSensor(lSensorValues) - getSensor(rSensorValues);
+        
         double power = P_DIST * deltaDist;
         power = (power > speed) ? speed : power;
-        double leftPower = power - P_HEAD * headingError;
-        double rightPower = power + P_HEAD * headingError;
+        // When squarerooting sensorDiff, record the original sign and add it back after the squareroot 
+        double leftPower = power - P_HEAD * headingError - P_SENSOR * Math.pow(sensorDiff, SENSOR_CURVE);
+        double rightPower = power + P_HEAD * headingError + P_SENSOR * Math.pow(sensorDiff, SENSOR_CURVE);
         
         leftMotor.setPower(leftPower);
         rightMotor.setPower(rightPower);
