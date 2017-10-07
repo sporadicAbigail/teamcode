@@ -15,15 +15,15 @@ public class AVCGoToGoal extends OpMode {
     private AnalogInput lUS;
     private DcMotor rightMotor;
     private DcMotor leftMotor;
-    private static final int SENSOR_VALUES_SIZE = 20;
+    private static final int SENSOR_VALUES_SIZE = 5;
     private static final double ROTATION_TICKS = 560;
     private static final double WHEEL_DIAMETER = 12.5;
     private static final double WHEEL_BASE = 29.25;
-    private static final double GTG_TOLERANCE = 5;
-    private static final double P_DIST = 1.0;
-    private static final double P_HEAD = 0.175;
-    private static final double P_SENSOR = 0.0025;
-    private static final double SENSOR_CURVE = 0.5;
+    private static final double GTG_TOLERANCE = 25;
+    private static final double P_DIST = 0.9;
+    private static final double P_HEAD = 0.180;
+    private static final double P_SENSOR = 0.0065;
+    private static final double SENSOR_PROX = 17.5;
     private double heading;
     private double coordX;
     private double coordY;
@@ -60,7 +60,7 @@ public class AVCGoToGoal extends OpMode {
         addPoint(-243, -457);
         addPoint(-243, 0);
         addPoint(0, 0);*/
-        addPoint(500, 0);
+        addPoint(1000, 0);
         rSensorValues = new ArrayList<>();
         lSensorValues = new ArrayList<>();
         heading = 0;
@@ -68,7 +68,7 @@ public class AVCGoToGoal extends OpMode {
         coordY = 0;
         lastEncLeft = leftMotor.getCurrentPosition();
         lastEncRight = rightMotor.getCurrentPosition();
-        speed = 0.30;
+        speed = 0.4;
         state = 1;
     }
 
@@ -143,13 +143,16 @@ public class AVCGoToGoal extends OpMode {
         double headingError = targetHeading - heading;
         headingError = (headingError > Math.PI) ? headingError - 2 * Math.PI : headingError;
         
-        int sensorDiff = getSensor(lSensorValues) - getSensor(rSensorValues);
+        int lSensor = getSensor(lSensorValues);
+        int rSensor = getSensor(rSensorValues);
+        double sensorDiff = (lSensor - rSensor) * (SENSOR_PROX / ((lSensor < rSensor) ? lSensor : rSensor));
         
         double power = P_DIST * deltaDist;
         power = (power > speed) ? speed : power;
-        // When squarerooting sensorDiff, record the original sign and add it back after the squareroot 
-        double leftPower = power - P_HEAD * headingError - P_SENSOR * Math.pow(sensorDiff, SENSOR_CURVE);
-        double rightPower = power + P_HEAD * headingError + P_SENSOR * Math.pow(sensorDiff, SENSOR_CURVE);
+        double leftPower = power - P_HEAD * headingError - P_SENSOR * sensorDiff;
+        double rightPower = power + P_HEAD * headingError + P_SENSOR * sensorDiff;
+        leftPower = (leftPower < 0) ? ((Math.abs(leftPower) > speed) ? -speed : leftPower) : ((leftPower > speed) ? speed : leftPower);
+        rightPower = (rightPower < 0) ? ((Math.abs(rightPower) > speed) ? -speed : rightPower) : ((rightPower > speed) ? speed : rightPower);
         
         leftMotor.setPower(leftPower);
         rightMotor.setPower(rightPower);
