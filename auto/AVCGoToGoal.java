@@ -19,12 +19,12 @@ public class AVCGoToGoal extends OpMode {
     private static final double ROTATION_TICKS = 560;
     private static final double WHEEL_DIAMETER = 12.5;
     private static final double WHEEL_BASE = 29.25;
-    private static final double GTG_TOLERANCE = 25; // how close it gets to the intended point before it moves on
-    private static final double P_DIST = 1; // how it slows down when it reahces the targett
+    private static final double GTG_TOLERANCE = 50; // how close it gets to the intended point before it moves on
+    private static final double P_DIST = 0.01; // how it slows down when it reaches the target
     private static final double P_HEAD = 0.185; // go to goal instructions on how to turn
     private static final double P_SENSOR = 0.005; // how fast the sensors start to panic
     private static final double SENSOR_PROX = 50; // when to start panicking
-    private static final double SENSOR_CURVE = 1.4; // curve of urgency
+    private static final double SENSOR_CURVE = 1.8; // curve of urgency
     private double heading;
     private double coordX;
     private double coordY;
@@ -61,7 +61,7 @@ public class AVCGoToGoal extends OpMode {
         addPoint(-243, -457);
         addPoint(-243, 0);
         addPoint(0, 0);*/
-        addPoint(500, 0);
+        addPoint(900, 0);
         rSensorValues = new ArrayList<>();
         lSensorValues = new ArrayList<>();
         heading = 0;
@@ -69,7 +69,7 @@ public class AVCGoToGoal extends OpMode {
         coordY = 0;
         lastEncLeft = leftMotor.getCurrentPosition();
         lastEncRight = rightMotor.getCurrentPosition();
-        speed = 0.4;
+        speed = 0.5;
         state = 1;
     }
 
@@ -146,12 +146,11 @@ public class AVCGoToGoal extends OpMode {
         
         int lSensor = getSensor(lSensorValues);
         int rSensor = getSensor(rSensorValues);
-        double sensorDiff = (lSensor - rSensor) * Math.pow(SENSOR_PROX / ((lSensor < rSensor) ? lSensor : rSensor), SENSOR_CURVE);
+        int nearest = (lSensor < rSensor) ? lSensor : rSensor;
+        double sensorDiff = (lSensor - rSensor) * Math.pow(SENSOR_PROX / nearest, SENSOR_CURVE);
 
-        double power = P_DIST * deltaDist;
-        power = (power > speed) ? speed : power;
-        double leftPower = power - P_HEAD * headingError - P_SENSOR * sensorDiff;
-        double rightPower = power + P_HEAD * headingError + P_SENSOR * sensorDiff;
+        double leftPower =(speed - P_HEAD * headingError - P_SENSOR * sensorDiff) * P_DIST * nearest;
+        double rightPower = (speed + P_HEAD * headingError + P_SENSOR * sensorDiff) * P_DIST * nearest;
         leftPower = (leftPower < 0) ? ((Math.abs(leftPower) > speed) ? -speed : leftPower) : ((leftPower > speed) ? speed : leftPower);
         rightPower = (rightPower < 0) ? ((Math.abs(rightPower) > speed) ? -speed : rightPower) : ((rightPower > speed) ? speed : rightPower);
         
