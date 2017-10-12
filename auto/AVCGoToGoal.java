@@ -62,11 +62,27 @@ public class AVCGoToGoal extends OpMode {
         addPoint(-243, 0);
         addPoint(0, 0);*/
         addPoint(900, 0);
+        //The points below map to the competition field
+        /*addPoint(0,0);
+        addPoint(610,-610);
+        addPoint(1524,-2469);
+        addPoint(2134,-747);
+        addPoint(2469,0);
+        addPoint(2134,747);
+        addPoint(1524,2469);
+        addPoint(610,610);
+        addPoint(0,0);
+        addPoint(-610,-610);
+        addPoint(-1524,-2469);
+        addPoint(-2134,-747);
+        addPoint(-2469,0);
+        addPoint(-2134,747);
+        addPoint(-1524,2468);*/
         rSensorValues = new ArrayList<>();
         lSensorValues = new ArrayList<>();
-        heading = 0;
-        coordX = 0;
-        coordY = 0;
+        heading = 5.6;
+        coordX = -610;
+        coordY = 610;
         lastEncLeft = leftMotor.getCurrentPosition();
         lastEncRight = rightMotor.getCurrentPosition();
         speed = 0.5;
